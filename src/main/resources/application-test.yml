@@ -1,0 +1,73 @@
+spring:
+  # 测试环境数据源 - 使用H2内存数据库
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # H2数据库配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA测试配置
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Redis测试配置（使用嵌入式或mock）
+  redis:
+    host: localhost
+    port: 6370
+    password:
+    timeout: 1000ms
+
+  # 邮件测试配置
+  mail:
+    host: localhost
+    port: 25
+    username: test
+    password: test
+    test-connection: false
+
+# 测试环境日志配置
+logging:
+  level:
+    root: WARN
+    com.visitmanagement: DEBUG
+    org.springframework.test: INFO
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# 测试环境应用配置
+app:
+  jwt:
+    secret: test-secret-key
+    expiration: 3600000  # 1小时
+
+  file:
+    upload-path: ./test-uploads
+    export-path: ./test-exports
+    max-size: 1048576  # 1MB
+
+  security:
+    cors:
+      allowed-origins: "*"
+
+# 测试环境监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
