@@ -105,9 +105,9 @@ public class VisitRecordResponse {
     private LocalDate followUpDate;
 
     /**
-     * 留下的资料
+     * 是否留下资料
      */
-    private String materialsLeft;
+    private Boolean materialsLeft;
 
     /**
      * 是否添加微信
