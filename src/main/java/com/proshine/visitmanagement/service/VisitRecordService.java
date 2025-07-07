@@ -153,7 +153,7 @@ public class VisitRecordService {
         visitRecord.setNextStep(request.getNextStep());
         visitRecord.setFollowUpDate(request.getFollowUpDate());
         visitRecord.setNotes(request.getNotes());
-        visitRecord.setMaterialsLeft(Boolean.TRUE.equals(request.getMaterialsLeft()));
+        visitRecord.setMaterialsLeft(request.getMaterialsLeft().isEmpty());
         visitRecord.setWechatAdded(request.getWechatAdded());
         visitRecord.setRating(request.getRating());
         visitRecord.setLocation(request.getLocation());
@@ -204,7 +204,7 @@ public class VisitRecordService {
         visitRecord.setNextStep(request.getNextStep());
         visitRecord.setFollowUpDate(request.getFollowUpDate());
         visitRecord.setNotes(request.getNotes());
-        visitRecord.setMaterialsLeft(Boolean.TRUE.equals(request.getMaterialsLeft()));
+        visitRecord.setMaterialsLeft(request.getMaterialsLeft().isEmpty());
         visitRecord.setWechatAdded(request.getWechatAdded());
         visitRecord.setRating(request.getRating());
         visitRecord.setLocation(request.getLocation());
@@ -585,7 +585,7 @@ public class VisitRecordService {
                 .decisionTimeline(visitRecord.getDecisionTimeline())
                 .nextStep(visitRecord.getNextStep())
                 .followUpDate(visitRecord.getFollowUpDate())
-                .materialsLeft(visitRecord.getMaterialsLeft())
+                .materialsLeft("")
                 .wechatAdded(visitRecord.getWechatAdded())
                 .rating(visitRecord.getRating())
                 .location(visitRecord.getLocation())

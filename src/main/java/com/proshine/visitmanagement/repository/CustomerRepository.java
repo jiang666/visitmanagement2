@@ -384,107 +384,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("SELECT c FROM Customer c WHERE c.createdAt BETWEEN :startTime AND :endTime")
     List<Customer> findByCreateTimeBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
-    @Query("SELECT c FROM Customer c " +
-            "LEFT JOIN c.department d " +
-            "LEFT JOIN d.school s " +
-            "WHERE (:keyword IS NULL OR :keyword = '' OR " +
-            "       LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(c.position) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:departmentId IS NULL OR c.department.id = :departmentId) " +
-            "AND (:schoolId IS NULL OR d.school.id = :schoolId) " +
-            "AND (:schoolCity IS NULL OR :schoolCity = '' OR s.city = :schoolCity) " +
-            "AND (:influenceLevel IS NULL OR c.influenceLevel = :influenceLevel) " +
-            "AND (:decisionPower IS NULL OR c.decisionPower = :decisionPower) " +
-            "AND (:hasWechat IS NULL OR (:hasWechat = TRUE AND c.wechat IS NOT NULL AND c.wechat <> '') OR " +
-            "     (:hasWechat = FALSE AND (c.wechat IS NULL OR c.wechat = ''))) " +
-            "ORDER BY c.createdAt DESC")
-    Page<Customer> findCustomersWithAllFilters(@Param("keyword") String keyword,
-                                               @Param("departmentId") Long departmentId,
-                                               @Param("schoolId") Long schoolId,
-                                               @Param("schoolCity") String schoolCity,
-                                               @Param("influenceLevel") Customer.InfluenceLevel influenceLevelEnum,
-                                               @Param("decisionPower") Customer.DecisionPower decisionPowerEnum,
-                                               @Param("hasWechat") Boolean hasWechat,
-                                               Pageable pageable);
+    Page<Customer> findCustomersWithAllFilters(String keyword, Long departmentId, Long schoolId, String schoolCity, Customer.InfluenceLevel influenceLevelEnum, Customer.DecisionPower decisionPowerEnum, Boolean hasWechat, Pageable pageable);
 
-    @Query("SELECT c FROM Customer c " +
-            "LEFT JOIN c.department d " +
-            "LEFT JOIN d.school s " +
-            "WHERE c.createdBy.id = :createdById " +
-            "AND (:keyword IS NULL OR :keyword = '' OR " +
-            "     LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(c.position) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:departmentId IS NULL OR c.department.id = :departmentId) " +
-            "AND (:schoolId IS NULL OR d.school.id = :schoolId) " +
-            "AND (:schoolCity IS NULL OR :schoolCity = '' OR s.city = :schoolCity) " +
-            "AND (:influenceLevel IS NULL OR c.influenceLevel = :influenceLevel) " +
-            "AND (:decisionPower IS NULL OR c.decisionPower = :decisionPower) " +
-            "AND (:hasWechat IS NULL OR (:hasWechat = TRUE AND c.wechat IS NOT NULL AND c.wechat <> '') OR " +
-            "     (:hasWechat = FALSE AND (c.wechat IS NULL OR c.wechat = ''))) " +
-            "ORDER BY c.createdAt DESC")
-    Page<Customer> findCustomersWithAllFiltersByCreatedBy(@Param("keyword") String keyword,
-                                                         @Param("departmentId") Long departmentId,
-                                                         @Param("schoolId") Long schoolId,
-                                                         @Param("schoolCity") String schoolCity,
-                                                         @Param("influenceLevel") Customer.InfluenceLevel influenceLevelEnum,
-                                                         @Param("decisionPower") Customer.DecisionPower decisionPowerEnum,
-                                                         @Param("hasWechat") Boolean hasWechat,
-                                                         @Param("createdById") Long id,
-                                                         Pageable pageable);
+    Page<Customer> findCustomersWithAllFiltersByCreatedBy(String keyword, Long departmentId, Long schoolId, String schoolCity, Customer.InfluenceLevel influenceLevelEnum, Customer.DecisionPower decisionPowerEnum, Boolean hasWechat, Long id, Pageable pageable);
 
-    @Query("SELECT c FROM Customer c " +
-            "LEFT JOIN c.department d " +
-            "LEFT JOIN d.school s " +
-            "WHERE (:keyword IS NULL OR :keyword = '' OR " +
-            "       LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(c.position) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "       LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:departmentId IS NULL OR c.department.id = :departmentId) " +
-            "AND (:schoolId IS NULL OR d.school.id = :schoolId) " +
-            "AND (:schoolCity IS NULL OR :schoolCity = '' OR s.city = :schoolCity) " +
-            "AND (:influenceLevel IS NULL OR c.influenceLevel = :influenceLevel) " +
-            "AND (:decisionPower IS NULL OR c.decisionPower = :decisionPower) " +
-            "AND (:hasWechat IS NULL OR (:hasWechat = TRUE AND c.wechat IS NOT NULL AND c.wechat <> '') OR " +
-            "     (:hasWechat = FALSE AND (c.wechat IS NULL OR c.wechat = ''))) " +
-            "ORDER BY c.createdAt DESC")
-    List<Customer> findCustomersForExport(@Param("keyword") String keyword,
-                                          @Param("departmentId") Long departmentId,
-                                          @Param("schoolId") Long schoolId,
-                                          @Param("schoolCity") String schoolCity,
-                                          @Param("influenceLevel") Customer.InfluenceLevel influenceLevelEnum,
-                                          @Param("decisionPower") Customer.DecisionPower decisionPowerEnum,
-                                          @Param("hasWechat") Boolean hasWechat);
+    List<Customer> findCustomersForExport(String keyword, Long departmentId, Long schoolId, String schoolCity, Customer.InfluenceLevel influenceLevelEnum, Customer.DecisionPower decisionPowerEnum, Boolean hasWechat);
 
-    @Query("SELECT c FROM Customer c " +
-            "LEFT JOIN c.department d " +
-            "LEFT JOIN d.school s " +
-            "WHERE c.createdBy.id = :createdById " +
-            "AND (:keyword IS NULL OR :keyword = '' OR " +
-            "     LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(c.position) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND (:departmentId IS NULL OR c.department.id = :departmentId) " +
-            "AND (:schoolId IS NULL OR d.school.id = :schoolId) " +
-            "AND (:schoolCity IS NULL OR :schoolCity = '' OR s.city = :schoolCity) " +
-            "AND (:influenceLevel IS NULL OR c.influenceLevel = :influenceLevel) " +
-            "AND (:decisionPower IS NULL OR c.decisionPower = :decisionPower) " +
-            "AND (:hasWechat IS NULL OR (:hasWechat = TRUE AND c.wechat IS NOT NULL AND c.wechat <> '') OR " +
-            "     (:hasWechat = FALSE AND (c.wechat IS NULL OR c.wechat = ''))) " +
-            "ORDER BY c.createdAt DESC")
-    List<Customer> findCustomersForExportByCreatedBy(@Param("keyword") String keyword,
-                                                     @Param("departmentId") Long departmentId,
-                                                     @Param("schoolId") Long schoolId,
-                                                     @Param("schoolCity") String schoolCity,
-                                                     @Param("influenceLevel") Customer.InfluenceLevel influenceLevelEnum,
-                                                     @Param("decisionPower") Customer.DecisionPower decisionPowerEnum,
-                                                     @Param("hasWechat") Boolean hasWechat,
-                                                     @Param("createdById") Long id);
+    List<Customer> findCustomersForExportByCreatedBy(String keyword, Long departmentId, Long schoolId, String schoolCity, Customer.InfluenceLevel influenceLevelEnum, Customer.DecisionPower decisionPowerEnum, Boolean hasWechat, Long id);
 
     List<Customer> findTop10ByOrderByCreatedAtDesc();
 

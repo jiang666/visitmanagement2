@@ -51,8 +51,8 @@ public class SchoolRequest {
     /**
      * 学校类型
      */
-    @Pattern(regexp = "^(PROJECT_985|PROJECT_211|DOUBLE_FIRST_CLASS|REGULAR)$",
-            message = "学校类型必须是: PROJECT_985, PROJECT_211, DOUBLE_FIRST_CLASS, REGULAR 之一")
+    @Pattern(regexp = "^(_985|_211|DOUBLE_FIRST_CLASS|REGULAR)$",
+            message = "学校类型必须是: _985, _211, DOUBLE_FIRST_CLASS, REGULAR 之一")
     private String schoolType;
 
     /**
