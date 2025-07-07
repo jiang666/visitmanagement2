@@ -62,8 +62,10 @@ public class VisitRecordRequest {
     @Size(max = 2000, message = "拜访备注长度不能超过2000个字符")
     private String notes;
     
-    @Size(max = 500, message = "留下资料长度不能超过500个字符")
-    private String materialsLeft;
+    /**
+     * 是否留下资料
+     */
+    private Boolean materialsLeft;
     
     private Boolean wechatAdded = false;
     
