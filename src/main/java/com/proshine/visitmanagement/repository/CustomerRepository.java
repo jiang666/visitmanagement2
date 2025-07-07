@@ -60,10 +60,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      */
     List<Customer> findByStatus(Customer.CustomerStatus status);
 
-    /**
-     * 根据地区查询客户
-     */
-    List<Customer> findByRegion(String region);
 
     /**
      * 根据邮箱查询客户
