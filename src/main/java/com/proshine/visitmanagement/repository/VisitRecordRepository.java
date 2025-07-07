@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 拜访记录数据访问层接口
@@ -135,11 +134,6 @@ public interface VisitRecordRepository extends JpaRepository<VisitRecord, Long> 
     @Query("SELECT vr FROM VisitRecord vr WHERE vr.sales.id = :salesId ORDER BY vr.visitDate DESC, vr.createdAt DESC")
     List<VisitRecord> findRecentVisitsBySalesId(@Param("salesId") Long salesId, Pageable pageable);
 
-    /**
-     * 根据客户查找最后一次拜访记录
-     */
-    @Query("SELECT vr FROM VisitRecord vr WHERE vr.customer.id = :customerId ORDER BY vr.visitDate DESC, vr.createdAt DESC")
-    Optional<VisitRecord> findLastVisitByCustomerId(@Param("customerId") Long customerId, Pageable pageable);
 
     // ==================== DashBoard 相关统计方法 ====================
 
