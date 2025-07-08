@@ -46,16 +46,16 @@ public class JwtTokenProvider {
     public void init() {
         // 确保密钥长度足够 - Java 8兼容版本
         String keyString = jwtSecret;
-        if (keyString.length() < 32) {
+        if (keyString.length() < 64) {
             // Java 8兼容的字符串重复方法
             String paddingString = "0123456789abcdef";
             StringBuilder sb = new StringBuilder(keyString);
 
-            while (sb.length() < 32) {
+            while (sb.length() < 64) {
                 sb.append(paddingString);
             }
 
-            keyString = sb.substring(0, 32);
+            keyString = sb.substring(0, 64);
         }
 
         this.secretKey = Keys.hmacShaKeyFor(keyString.getBytes(StandardCharsets.UTF_8));
