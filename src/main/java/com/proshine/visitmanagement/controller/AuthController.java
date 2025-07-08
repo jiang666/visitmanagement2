@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
  * @since 2024-01-01
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
