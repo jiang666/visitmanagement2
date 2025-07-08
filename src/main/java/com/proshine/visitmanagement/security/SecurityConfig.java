@@ -83,9 +83,9 @@ public class SecurityConfig {
                 .authorizeRequests()
                 // 公开端点 - 不需要认证
                 .antMatchers(
-                        "/auth/login",
-                        "/auth/register",
-                        "/auth/refresh",
+                        "/api/auth/login",
+                        "/api/auth/register",
+                        "/api/auth/refresh",
                         "/actuator/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
@@ -107,53 +107,53 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
 
                 // 认证相关端点
-                .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/auth/verify").authenticated()
-                .antMatchers(HttpMethod.GET, "/auth/user-info").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/auth/verify").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/auth/user-info").authenticated()
 
                 // 用户管理 - 需要管理员权限
-                .antMatchers(HttpMethod.GET, "/users/**").hasAnyRole("ADMIN", "MANAGER")
-                .antMatchers(HttpMethod.POST, "/users/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "MANAGER")
+                .antMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
 
                 // 学校管理 - 需要管理员权限
-                .antMatchers(HttpMethod.GET, "/schools/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.POST, "/schools/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/schools/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/schools/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/schools/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.POST, "/api/schools/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/schools/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/schools/**").hasRole("ADMIN")
 
                 // 院系管理 - 需要管理员权限
-                .antMatchers(HttpMethod.GET, "/departments/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.POST, "/departments/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/departments/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/departments/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/departments/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.POST, "/api/departments/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/departments/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/departments/**").hasRole("ADMIN")
 
                 // 客户管理 - 所有登录用户都可以访问
-                .antMatchers(HttpMethod.GET, "/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.POST, "/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.PUT, "/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.DELETE, "/customers/**").hasAnyRole("ADMIN", "MANAGER")
+                .antMatchers(HttpMethod.GET, "/api/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.POST, "/api/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.PUT, "/api/customers/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.DELETE, "/api/customers/**").hasAnyRole("ADMIN", "MANAGER")
 
                 // 拜访记录管理 - 所有登录用户都可以访问
-                .antMatchers(HttpMethod.GET, "/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.POST, "/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.PUT, "/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.DELETE, "/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.GET, "/api/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.POST, "/api/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.PUT, "/api/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.DELETE, "/api/visits/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
 
                 // 仪表盘 - 所有登录用户都可以访问
-                .antMatchers(HttpMethod.GET, "/dashboard/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.GET, "/api/dashboard/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
 
                 // 文件上传下载
-                .antMatchers(HttpMethod.POST, "/files/upload").hasAnyRole("ADMIN", "MANAGER", "SALES")
-                .antMatchers(HttpMethod.GET, "/files/download/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("ADMIN", "MANAGER", "SALES")
+                .antMatchers(HttpMethod.GET, "/api/files/download/**").hasAnyRole("ADMIN", "MANAGER", "SALES")
 
                 // 数据导出 - 需要管理员或经理权限
-                .antMatchers(HttpMethod.GET, "/export/**").hasAnyRole("ADMIN", "MANAGER")
+                .antMatchers(HttpMethod.GET, "/api/export/**").hasAnyRole("ADMIN", "MANAGER")
 
                 // 系统配置 - 需要管理员权限
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/config/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/config/**").hasRole("ADMIN")
 
                 // 其他所有请求都需要认证
                 .anyRequest().authenticated()
