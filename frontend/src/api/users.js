@@ -43,7 +43,7 @@ export function updateUserStatus(id, status) {
   return request({
     url: `/users/${id}/status`,
     method: 'patch',
-    params: { status }
+    data: { status }
   })
 }
 
@@ -57,8 +57,12 @@ export function resetUserPassword(id, password) {
 
 export function getUsersByRole(role) {
   return request({
-    url: '/users/by-role',
+    url: '/users',
     method: 'get',
-    params: { role }
+    params: {
+      role,
+      page: 0,
+      size: 1000
+    }
   })
 }

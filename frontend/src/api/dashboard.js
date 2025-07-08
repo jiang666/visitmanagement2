@@ -5,7 +5,7 @@ import request from '@/utils/request'
  */
 export function getDashboardData() {
   return request({
-    url: '/dashboard/data',
+    url: '/dashboard/overview',
     method: 'get'
   })
 }
@@ -15,7 +15,7 @@ export function getDashboardData() {
  */
 export function getStatistics(params) {
   return request({
-    url: '/dashboard/statistics',
+    url: '/dashboard/visit-statistics',
     method: 'get',
     params
   })

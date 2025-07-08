@@ -131,20 +131,18 @@
           
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
-              <el-button size="small" @click="handleEdit(row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="warning" @click="handleResetPassword(row)">
-                重置密码
-              </el-button>
-              <el-button 
-                size="small" 
-                type="danger" 
-                @click="handleDelete(row)"
-                :disabled="row.role === 'ADMIN' && row.id === currentUserId"
-              >
-                删除
-              </el-button>
+              <div class="actions">
+                <el-button size="small" @click="handleEdit(row)">编辑</el-button>
+                <el-button size="small" type="warning" @click="handleResetPassword(row)">重置密码</el-button>
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="handleDelete(row)"
+                  :disabled="row.role === 'ADMIN' && row.id === currentUserId"
+                >
+                  删除
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -225,10 +223,16 @@
   import {
     Search, Refresh, Plus, Delete
   } from '@element-plus/icons-vue'
-  import {
-    getUserList, createUser, updateUser, deleteUser,
-    batchDeleteUsers, updateUserStatus, resetUserPassword
-  } from '@/api/users'
+import {
+  getUserList,
+  createUser,
+  updateUser,
+  deleteUser,
+  batchDeleteUsers,
+  updateUserStatus,
+  resetUserPassword
+} from '@/api/users'
+import { ElMessage, ElMessageBox } from 'element-plus'
   
   const userStore = useUserStore()
   
@@ -404,12 +408,12 @@
   }
   
   const handleStatusChange = async (row) => {
+    const previous = row.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
     try {
       await updateUserStatus(row.id, row.status)
       ElMessage.success('状态更新成功')
     } catch (error) {
-      // 恢复原状态
-      row.status = row.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
+      row.status = previous
       ElMessage.error('状态更新失败')
     }
   }
@@ -513,6 +517,12 @@
     .pagination {
       margin-top: 20px;
       text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
     }
   }
   </style>
