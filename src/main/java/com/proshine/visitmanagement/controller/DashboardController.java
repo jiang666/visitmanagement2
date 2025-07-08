@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2024-01-01
  */
 @RestController
-@RequestMapping("/dashboard")
+@RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
