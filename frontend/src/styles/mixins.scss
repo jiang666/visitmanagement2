@@ -1,0 +1,49 @@
+// Sass混合器
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  @mixin card-style {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  @mixin button-style($color) {
+    background-color: $color;
+    border-color: $color;
+    color: white;
+    
+    &:hover {
+      background-color: lighten($color, 10%);
+      border-color: lighten($color, 10%);
+    }
+  }
+  
+  // 响应式断点
+  @mixin mobile {
+    @media (max-width: 768px) {
+      @content;
+    }
+  }
+  
+  @mixin tablet {
+    @media (min-width: 769px) and (max-width: 1024px) {
+      @content;
+    }
+  }
+  
+  @mixin desktop {
+    @media (min-width: 1025px) {
+      @content;
+    }
+  }  

@@ -334,6 +334,6 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-        configurer.enable();
+        //configurer.enable();
     }
 }
