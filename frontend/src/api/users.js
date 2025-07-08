@@ -57,8 +57,12 @@ export function resetUserPassword(id, password) {
 
 export function getUsersByRole(role) {
   return request({
-    url: '/users/by-role',
+    url: '/users',
     method: 'get',
-    params: { role }
+    params: {
+      role,
+      page: 0,
+      size: 1000
+    }
   })
 }
