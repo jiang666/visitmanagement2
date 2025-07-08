@@ -131,20 +131,18 @@
           
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
-              <el-button size="small" @click="handleEdit(row)">
-                编辑
-              </el-button>
-              <el-button size="small" type="warning" @click="handleResetPassword(row)">
-                重置密码
-              </el-button>
-              <el-button 
-                size="small" 
-                type="danger" 
-                @click="handleDelete(row)"
-                :disabled="row.role === 'ADMIN' && row.id === currentUserId"
-              >
-                删除
-              </el-button>
+              <div class="actions">
+                <el-button size="small" @click="handleEdit(row)">编辑</el-button>
+                <el-button size="small" type="warning" @click="handleResetPassword(row)">重置密码</el-button>
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="handleDelete(row)"
+                  :disabled="row.role === 'ADMIN' && row.id === currentUserId"
+                >
+                  删除
+                </el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -513,6 +511,12 @@
     .pagination {
       margin-top: 20px;
       text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
     }
   }
   </style>
