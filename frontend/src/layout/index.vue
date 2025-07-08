@@ -25,7 +25,7 @@
             <el-menu-item
               v-for="child in getVisibleChildren(route)"
               :key="child.path"
-              :index="child.path"
+              :index="`${route.path}/${child.path}`"
             >
               {{ child.meta.title }}
             </el-menu-item>
