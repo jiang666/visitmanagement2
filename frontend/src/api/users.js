@@ -43,7 +43,7 @@ export function updateUserStatus(id, status) {
   return request({
     url: `/users/${id}/status`,
     method: 'patch',
-    params: { status }
+    data: { status }
   })
 }
 
