@@ -175,13 +175,18 @@
   const loadDashboardData = async () => {
     try {
       const response = await getDashboardData()
-      const { stats, visitTrend, intentDistribution, recentVisitList, reminderList } = response.data
+      const data = response.data || {}
+      const stats = data.stats || data.basicStats || {}
+      const visitTrend = data.visitTrend || data.trendData?.visitTrend || []
+      const intentDistribution = data.intentDistribution || data.intentStats || []
+      const recentVisitList = data.recentVisitList || data.recentVisits || []
+      const reminderList = data.reminderList || data.reminders || []
       
       // 更新统计卡片
-      statsCards.value[0].value = stats.totalVisits
-      statsCards.value[1].value = stats.completedVisits
-      statsCards.value[2].value = stats.scheduledVisits
-      statsCards.value[3].value = stats.aLevelCustomers
+      statsCards.value[0].value = stats.totalVisits || 0
+      statsCards.value[1].value = stats.completedVisits || 0
+      statsCards.value[2].value = stats.scheduledVisits || 0
+      statsCards.value[3].value = stats.aLevelCustomers || 0
       
       // 更新图表数据
       visitTrendOption.value.xAxis.data = visitTrend.map(item => item.date)
