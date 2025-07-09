@@ -169,7 +169,7 @@
   
   const filterForm = reactive({
     dateRange: [],
-    salesId: ''
+    salesId: null
   })
   
   const trendPeriod = ref('month')
@@ -389,7 +389,7 @@
   
   const handleReset = () => {
     filterForm.dateRange = []
-    filterForm.salesId = ''
+    filterForm.salesId = null
     loadAnalysisData()
     loadTrendData()
     loadReportData()
