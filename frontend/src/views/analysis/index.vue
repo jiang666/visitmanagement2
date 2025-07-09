@@ -16,7 +16,12 @@
           </el-form-item>
           
           <el-form-item label="销售人员">
-            <el-select v-model="filterForm.salesId" placeholder="全部" clearable style="width: 150px">
+            <el-select
+              v-model="filterForm.salesId"
+              placeholder="全部"
+              clearable
+              class="standard-select"
+            >
               <el-option
                 v-for="sales in salesOptions"
                 :key="sales.id"

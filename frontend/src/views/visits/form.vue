@@ -30,6 +30,7 @@
                   remote
                   :remote-method="searchCustomers"
                   style="width: 100%"
+                  class="standard-select"
                 >
                   <el-option
                     v-for="customer in customerOptions"
@@ -84,7 +85,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="拜访类型" prop="visitType">
-                <el-select v-model="form.visitType" placeholder="请选择" style="width: 100%">
+                <el-select
+                  v-model="form.visitType"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option label="首次拜访" value="FIRST_VISIT" />
                   <el-option label="跟进拜访" value="FOLLOW_UP" />
                   <el-option label="技术交流" value="TECHNICAL" />
@@ -96,7 +102,12 @@
             
             <el-col :span="12">
               <el-form-item label="拜访状态" prop="status">
-                <el-select v-model="form.status" placeholder="请选择" style="width: 100%">
+                <el-select
+                  v-model="form.status"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option label="已安排" value="SCHEDULED" />
                   <el-option label="已完成" value="COMPLETED" />
                   <el-option label="已取消" value="CANCELLED" />
@@ -109,7 +120,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="意向等级" prop="intentLevel">
-                <el-select v-model="form.intentLevel" placeholder="请选择" style="width: 100%">
+                <el-select
+                  v-model="form.intentLevel"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option label="A类（高意向）" value="A" />
                   <el-option label="B类（中意向）" value="B" />
                   <el-option label="C类（低意向）" value="C" />

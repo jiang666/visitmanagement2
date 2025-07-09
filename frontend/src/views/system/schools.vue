@@ -14,7 +14,12 @@
             </el-form-item>
             
             <el-form-item label="省份">
-              <el-select v-model="searchForm.province" placeholder="全部省份" clearable>
+              <el-select
+                v-model="searchForm.province"
+                placeholder="全部省份"
+                clearable
+                class="standard-select"
+              >
                 <el-option
                   v-for="province in provinceOptions"
                   :key="province"
@@ -25,7 +30,12 @@
             </el-form-item>
             
             <el-form-item label="学校类型">
-              <el-select v-model="searchForm.schoolType" placeholder="全部类型" clearable>
+              <el-select
+                v-model="searchForm.schoolType"
+                placeholder="全部类型"
+                clearable
+                class="standard-select"
+              >
                 <el-option
                   v-for="item in schoolTypeOptions"
                   :key="item.value"
@@ -156,7 +166,12 @@
           </el-form-item>
           
           <el-form-item label="学校类型" prop="schoolType">
-            <el-select v-model="schoolForm.schoolType" placeholder="请选择学校类型" style="width: 100%">
+            <el-select
+              v-model="schoolForm.schoolType"
+              placeholder="请选择学校类型"
+              style="width: 100%"
+              class="standard-select"
+            >
               <el-option
                 v-for="item in schoolTypeOptions"
                 :key="item.value"
@@ -169,7 +184,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="省份" prop="province">
-                <el-select v-model="schoolForm.province" placeholder="请选择省份" style="width: 100%">
+                <el-select
+                  v-model="schoolForm.province"
+                  placeholder="请选择省份"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option
                     v-for="province in provinceOptions"
                     :key="province"

@@ -14,7 +14,12 @@
             </el-form-item>
             
             <el-form-item label="角色">
-              <el-select v-model="searchForm.role" placeholder="全部角色" clearable>
+              <el-select
+                v-model="searchForm.role"
+                placeholder="全部角色"
+                clearable
+                class="standard-select"
+              >
                 <el-option
                   v-for="item in roleOptions"
                   :key="item.value"
@@ -25,7 +30,12 @@
             </el-form-item>
             
             <el-form-item label="状态">
-              <el-select v-model="searchForm.status" placeholder="全部状态" clearable>
+              <el-select
+                v-model="searchForm.status"
+                placeholder="全部状态"
+                clearable
+                class="standard-select"
+              >
                 <el-option label="激活" value="ACTIVE" />
                 <el-option label="禁用" value="INACTIVE" />
               </el-select>
@@ -198,7 +208,12 @@
           </el-form-item>
           
           <el-form-item label="角色" prop="role">
-            <el-select v-model="userForm.role" placeholder="请选择角色" style="width: 100%">
+            <el-select
+              v-model="userForm.role"
+              placeholder="请选择角色"
+              style="width: 100%"
+              class="standard-select"
+            >
               <el-option
                 v-for="item in roleOptions"
                 :key="item.value"
