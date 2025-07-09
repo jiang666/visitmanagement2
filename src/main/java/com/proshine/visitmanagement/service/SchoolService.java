@@ -4,6 +4,7 @@ import com.proshine.visitmanagement.dto.request.SchoolRequest;
 import com.proshine.visitmanagement.dto.response.DepartmentResponse;
 import com.proshine.visitmanagement.dto.response.PageResponse;
 import com.proshine.visitmanagement.dto.response.SchoolResponse;
+import com.proshine.visitmanagement.dto.response.SchoolDepartmentTreeResponse;
 import com.proshine.visitmanagement.entity.Customer;
 import com.proshine.visitmanagement.entity.Department;
 import com.proshine.visitmanagement.entity.School;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -382,6 +384,38 @@ public class SchoolService {
                 .filter(StringUtils::hasText)
                 .distinct()
                 .sorted()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取学校-院系树结构
+     */
+    public List<SchoolDepartmentTreeResponse> getSchoolDepartmentTree(Authentication authentication) {
+        log.debug("获取学校-院系树结构");
+
+        // 所有用户均可查询，无需额外权限校验
+        List<School> schools = schoolRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+        List<Department> departments = departmentRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+
+        Map<Long, List<Department>> deptMap = departments.stream()
+                .collect(Collectors.groupingBy(dept -> dept.getSchool().getId()));
+
+        return schools.stream()
+                .map(school -> {
+                    List<SchoolDepartmentTreeResponse.DepartmentNode> deptNodes =
+                            deptMap.getOrDefault(school.getId(), Collections.emptyList()).stream()
+                                    .map(dept -> SchoolDepartmentTreeResponse.DepartmentNode.builder()
+                                            .id(dept.getId())
+                                            .name(dept.getName())
+                                            .build())
+                                    .collect(Collectors.toList());
+
+                    return SchoolDepartmentTreeResponse.builder()
+                            .id(school.getId())
+                            .name(school.getName())
+                            .departments(deptNodes)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
