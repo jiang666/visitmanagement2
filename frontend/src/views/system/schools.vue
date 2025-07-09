@@ -326,8 +326,8 @@
   ]
 
   const schoolTypeOptions = [
-    { label: '985工程', value: '_985' },
-    { label: '211工程', value: '_211' },
+    { label: '985工程', value: 'PROJECT_985' },
+    { label: '211工程', value: 'PROJECT_211' },
     { label: '双一流', value: 'DOUBLE_FIRST_CLASS' },
     { label: '普通高校', value: 'REGULAR' }
   ]
@@ -547,8 +547,8 @@
   
   const getSchoolTypeColor = (type) => {
     const colorMap = {
-      '_985': 'danger',
-      '_211': 'warning',
+      'PROJECT_985': 'danger',
+      'PROJECT_211': 'warning',
       'DOUBLE_FIRST_CLASS': 'success',
       'REGULAR': 'info'
     }
