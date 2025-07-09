@@ -14,7 +14,12 @@
             </el-form-item>
             
             <el-form-item label="省份">
-              <el-select v-model="searchForm.province" placeholder="全部省份" clearable>
+              <el-select
+                v-model="searchForm.province"
+                placeholder="全部省份"
+                clearable
+                class="standard-select"
+              >
                 <el-option
                   v-for="province in provinceOptions"
                   :key="province"
@@ -25,11 +30,18 @@
             </el-form-item>
             
             <el-form-item label="学校类型">
-              <el-select v-model="searchForm.schoolType" placeholder="全部类型" clearable>
-                <el-option label="985工程" value="_985" />
-                <el-option label="211工程" value="_211" />
-                <el-option label="双一流" value="DOUBLE_FIRST_CLASS" />
-                <el-option label="普通高校" value="REGULAR" />
+              <el-select
+                v-model="searchForm.schoolType"
+                placeholder="全部类型"
+                clearable
+                class="standard-select"
+              >
+                <el-option
+                  v-for="item in schoolTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
             
@@ -154,18 +166,30 @@
           </el-form-item>
           
           <el-form-item label="学校类型" prop="schoolType">
-            <el-select v-model="schoolForm.schoolType" placeholder="请选择学校类型" style="width: 100%">
-              <el-option label="985工程" value="_985" />
-              <el-option label="211工程" value="_211" />
-              <el-option label="双一流" value="DOUBLE_FIRST_CLASS" />
-              <el-option label="普通高校" value="REGULAR" />
+            <el-select
+              v-model="schoolForm.schoolType"
+              placeholder="请选择学校类型"
+              style="width: 100%"
+              class="standard-select"
+            >
+              <el-option
+                v-for="item in schoolTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="省份" prop="province">
-                <el-select v-model="schoolForm.province" placeholder="请选择省份" style="width: 100%">
+                <el-select
+                  v-model="schoolForm.province"
+                  placeholder="请选择省份"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option
                     v-for="province in provinceOptions"
                     :key="province"
@@ -245,6 +269,7 @@
   <script setup>
   import { ref, reactive, onMounted } from 'vue'
   import { Search, Refresh, Plus, Upload, Download } from '@element-plus/icons-vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import {
     getSchoolList, createSchool, updateSchool, deleteSchool,
     getDepartmentsBySchool, createDepartment, updateDepartment, deleteDepartment,
@@ -266,8 +291,8 @@
   
   const searchForm = reactive({
     keyword: '',
-    province: '',
-    schoolType: ''
+    province: null,
+    schoolType: null
   })
   
   const pagination = reactive({
@@ -293,12 +318,31 @@
     address: '',
     description: ''
   })
+
+  const refreshDepartments = async (schoolId) => {
+    const school = tableData.value.find((s) => s.id === schoolId)
+    if (school) {
+      try {
+        const res = await getDepartmentsBySchool(schoolId)
+        school.departments = res.data
+      } catch (err) {
+        console.error('刷新院系失败:', err)
+      }
+    }
+  }
   
   const provinceOptions = [
     '北京', '天津', '河北', '山西', '内蒙古', '辽宁', '吉林', '黑龙江',
     '上海', '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南',
     '湖北', '湖南', '广东', '广西', '海南', '重庆', '四川', '贵州',
     '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '香港', '澳门', '台湾'
+  ]
+
+  const schoolTypeOptions = [
+    { label: '985工程', value: 'PROJECT_985' },
+    { label: '211工程', value: 'PROJECT_211' },
+    { label: '双一流', value: 'DOUBLE_FIRST_CLASS' },
+    { label: '普通高校', value: 'REGULAR' }
   ]
   
   const schoolRules = {
@@ -354,8 +398,8 @@
   const handleReset = () => {
     Object.assign(searchForm, {
       keyword: '',
-      province: '',
-      schoolType: ''
+      province: null,
+      schoolType: null
     })
     pagination.page = 1
     loadData()
@@ -389,6 +433,9 @@
       if (!valid) return
       
       schoolSubmitting.value = true
+      if (schoolForm.website && !/^https?:\/\//i.test(schoolForm.website)) {
+        schoolForm.website = `https://${schoolForm.website}`
+      }
       try {
         if (isEditSchool.value) {
           await updateSchool(schoolForm.id, schoolForm)
@@ -458,6 +505,7 @@
           ElMessage.success('创建成功')
         }
         departmentDialogVisible.value = false
+        await refreshDepartments(departmentForm.schoolId)
         loadData()
       } catch (error) {
         ElMessage.error(error.message || '操作失败')
@@ -475,6 +523,7 @@
       
       await deleteDepartment(dept.id)
       ElMessage.success('删除成功')
+      await refreshDepartments(dept.schoolId)
       loadData()
     } catch (error) {
       if (error !== 'cancel') {
@@ -516,8 +565,8 @@
   
   const getSchoolTypeColor = (type) => {
     const colorMap = {
-      '_985': 'danger',
-      '_211': 'warning',
+      'PROJECT_985': 'danger',
+      'PROJECT_211': 'warning',
       'DOUBLE_FIRST_CLASS': 'success',
       'REGULAR': 'info'
     }
@@ -525,13 +574,8 @@
   }
   
   const getSchoolTypeText = (type) => {
-    const textMap = {
-      '_985': '985工程',
-      '_211': '211工程',
-      'DOUBLE_FIRST_CLASS': '双一流',
-      'REGULAR': '普通高校'
-    }
-    return textMap[type] || type
+    const map = Object.fromEntries(schoolTypeOptions.map(item => [item.value, item.label]))
+    return map[type] || type
   }
   
   onMounted(() => {
