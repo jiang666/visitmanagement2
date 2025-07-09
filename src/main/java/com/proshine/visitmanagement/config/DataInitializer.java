@@ -37,4 +37,5 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Initialized default admin user");
         }
     }
+
 }
