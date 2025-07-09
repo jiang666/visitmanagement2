@@ -173,8 +173,8 @@
   
   const searchForm = reactive({
     keyword: '',
-    influenceLevel: '',
-    decisionPower: ''
+    influenceLevel: null,
+    decisionPower: null
   })
   
   const pagination = reactive({
@@ -214,8 +214,8 @@
   const handleReset = () => {
     Object.assign(searchForm, {
       keyword: '',
-      influenceLevel: '',
-      decisionPower: ''
+      influenceLevel: null,
+      decisionPower: null
     })
     pagination.page = 1
     loadData()

@@ -266,8 +266,8 @@
   
   const searchForm = reactive({
     keyword: '',
-    province: '',
-    schoolType: ''
+    province: null,
+    schoolType: null
   })
   
   const pagination = reactive({
@@ -354,8 +354,8 @@
   const handleReset = () => {
     Object.assign(searchForm, {
       keyword: '',
-      province: '',
-      schoolType: ''
+      province: null,
+      schoolType: null
     })
     pagination.page = 1
     loadData()

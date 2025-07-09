@@ -66,9 +66,9 @@
               <div class="card-header">
                 <span>拜访趋势分析</span>
                 <el-radio-group v-model="trendPeriod" size="small" @change="loadTrendData">
-                  <el-radio-button label="week">最近7天</el-radio-button>
-                  <el-radio-button label="month">最近30天</el-radio-button>
-                  <el-radio-button label="quarter">最近3个月</el-radio-button>
+                  <el-radio-button value="week" label="week">最近7天</el-radio-button>
+                  <el-radio-button value="month" label="month">最近30天</el-radio-button>
+                  <el-radio-button value="quarter" label="quarter">最近3个月</el-radio-button>
                 </el-radio-group>
               </div>
             </template>
@@ -169,7 +169,7 @@
   
   const filterForm = reactive({
     dateRange: [],
-    salesId: ''
+    salesId: null
   })
   
   const trendPeriod = ref('month')
@@ -292,7 +292,9 @@
   const loadSalesOptions = async () => {
     try {
       const response = await getUsersByRole('SALES')
-      salesOptions.value = response.data
+      salesOptions.value = Array.isArray(response.data?.content)
+        ? response.data.content
+        : []
     } catch (error) {
       console.error('加载销售人员失败:', error)
     }
@@ -308,31 +310,39 @@
       }
       
       const response = await getAnalysisData(params)
-      const { stats, intentDistribution, salesRanking, schoolRanking } = response.data
+      const data = response.data || {}
+      const stats = data.stats || {}
+      const intentDistribution = data.intentDistribution || []
+      const salesRanking = data.salesRanking || []
+      const schoolRanking = data.schoolRanking || []
       
       // 更新统计卡片
-      statsCards.value[0].value = stats.totalVisits
-      statsCards.value[0].change = stats.visitChange
-      statsCards.value[1].value = `${stats.completionRate}%`
-      statsCards.value[1].change = stats.completionRateChange
-      statsCards.value[2].value = stats.aLevelCustomers
-      statsCards.value[2].change = stats.aLevelChange
-      statsCards.value[3].value = stats.avgRating.toFixed(1)
-      statsCards.value[3].change = stats.ratingChange
+      statsCards.value[0].value = stats.totalVisits || 0
+      statsCards.value[0].change = stats.visitChange || 0
+      statsCards.value[1].value = stats.completionRate ? `${stats.completionRate}%` : '0%'
+      statsCards.value[1].change = stats.completionRateChange || 0
+      statsCards.value[2].value = stats.aLevelCustomers || 0
+      statsCards.value[2].change = stats.aLevelChange || 0
+      statsCards.value[3].value = stats.avgRating ? stats.avgRating.toFixed(1) : 0
+      statsCards.value[3].change = stats.ratingChange || 0
       
       // 更新意向分布图
-      intentDistributionOption.value.series[0].data = intentDistribution.map(item => ({
-        name: `${item.level}类客户`,
-        value: item.count
-      }))
+      intentDistributionOption.value.series[0].data = Array.isArray(intentDistribution)
+        ? intentDistribution.map(item => ({
+            name: `${item.level}类客户`,
+            value: item.count
+          }))
+        : []
       
       // 更新销售排名图
-      salesRankingOption.value.yAxis.data = salesRanking.map(item => item.salesName)
-      salesRankingOption.value.series[0].data = salesRanking.map(item => item.visitCount)
+      const rankingList = Array.isArray(salesRanking) ? salesRanking : []
+      salesRankingOption.value.yAxis.data = rankingList.map(item => item.salesName)
+      salesRankingOption.value.series[0].data = rankingList.map(item => item.visitCount)
       
       // 更新学校排名图
-      schoolRankingOption.value.xAxis.data = schoolRanking.map(item => item.schoolName)
-      schoolRankingOption.value.series[0].data = schoolRanking.map(item => item.visitCount)
+      const schoolList = Array.isArray(schoolRanking) ? schoolRanking : []
+      schoolRankingOption.value.xAxis.data = schoolList.map(item => item.schoolName)
+      schoolRankingOption.value.series[0].data = schoolList.map(item => item.visitCount)
       
     } catch (error) {
       console.error('加载分析数据失败:', error)
@@ -348,8 +358,8 @@
       }
       
       const response = await getAnalysisData({ ...params, type: 'trend' })
-      const { visitTrend } = response.data
-      
+      const visitTrend = Array.isArray(response.data?.visitTrend) ? response.data.visitTrend : []
+
       visitTrendOption.value.xAxis.data = visitTrend.map(item => item.date)
       visitTrendOption.value.series[0].data = visitTrend.map(item => item.count)
     } catch (error) {
@@ -368,7 +378,8 @@
       }
       
       const response = await getSalesPerformance(params)
-      reportData.value = response.data
+      const list = Array.isArray(response.data) ? response.data : (response.data?.list || [])
+      reportData.value = list
     } catch (error) {
       console.error('加载报表数据失败:', error)
     } finally {
@@ -378,7 +389,7 @@
   
   const handleReset = () => {
     filterForm.dateRange = []
-    filterForm.salesId = ''
+    filterForm.salesId = null
     loadAnalysisData()
     loadTrendData()
     loadReportData()
