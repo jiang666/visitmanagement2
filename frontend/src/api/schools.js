@@ -40,7 +40,7 @@ export function deleteSchool(id) {
 
 export function getDepartmentsBySchool(schoolId) {
   return request({
-    url: `/schools/${schoolId}/departments`,
+    url: `/departments/by-school/${schoolId}`,
     method: 'get'
   })
 }
