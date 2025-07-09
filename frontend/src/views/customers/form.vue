@@ -204,7 +204,7 @@
     value: 'id',
     label: 'name',
     children: 'departments',
-    emitPath: false,
+    emitPath: true,
     checkStrictly: true
   }
   
