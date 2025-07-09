@@ -1,6 +1,7 @@
 package com.proshine.visitmanagement.controller;
 
 import com.proshine.visitmanagement.dto.request.UserRequest;
+import com.proshine.visitmanagement.dto.request.UserStatusRequest;
 import com.proshine.visitmanagement.dto.response.ApiResponse;
 import com.proshine.visitmanagement.dto.response.PageResponse;
 import com.proshine.visitmanagement.dto.response.UserResponse;
@@ -8,6 +9,7 @@ import com.proshine.visitmanagement.entity.User;
 import com.proshine.visitmanagement.service.UserService;
 import com.proshine.visitmanagement.util.ExcelUtils;
 import com.proshine.visitmanagement.util.ValidationUtils;
+import com.proshine.visitmanagement.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -163,15 +165,21 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ApiResponse<Void> changeUserStatus(
             @PathVariable @NotNull Long id,
-            @RequestParam boolean enabled) {
+            @RequestBody @Validated UserStatusRequest request) {
 
-        log.info("修改用户状态: id={}, enabled={}", id, enabled);
+        String statusStr = request.getStatus();
+        log.info("修改用户状态: id={}, status={}", id, statusStr);
 
-        userService.changeUserStatus(id, enabled);
+        if (statusStr == null) {
+            throw ValidationException.withMessage("status不能为空");
+        }
 
-        log.info("用户状态修改成功: id={}, enabled={}", id, enabled);
+        User.UserStatus status = User.UserStatus.valueOf(statusStr);
+        userService.updateUserStatus(id, status);
 
-        return ApiResponse.success(enabled ? "用户已启用" : "用户已禁用");
+        log.info("用户状态修改成功: id={}, status={}", id, status);
+
+        return ApiResponse.success("用户状态已更新");
     }
 
     /**
