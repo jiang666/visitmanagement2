@@ -346,7 +346,9 @@
     } catch (err) {
       console.error('刷新院系失败:', err)
     }
+
 }
+
 
   
   const provinceOptions = [
@@ -387,8 +389,11 @@
       
       const response = await getSchoolList(params)
       const { content, totalElements } = response.data
-      
-      tableData.value = content
+
+      tableData.value = content.map(item => ({
+        ...item,
+        hasChildren: true
+      }))
       pagination.total = totalElements
     } catch (error) {
       console.error('加载数据失败:', error)
