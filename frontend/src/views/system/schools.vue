@@ -26,10 +26,12 @@
             
             <el-form-item label="学校类型">
               <el-select v-model="searchForm.schoolType" placeholder="全部类型" clearable>
-                <el-option label="985工程" value="_985" />
-                <el-option label="211工程" value="_211" />
-                <el-option label="双一流" value="DOUBLE_FIRST_CLASS" />
-                <el-option label="普通高校" value="REGULAR" />
+                <el-option
+                  v-for="item in schoolTypeOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
             
@@ -155,10 +157,12 @@
           
           <el-form-item label="学校类型" prop="schoolType">
             <el-select v-model="schoolForm.schoolType" placeholder="请选择学校类型" style="width: 100%">
-              <el-option label="985工程" value="_985" />
-              <el-option label="211工程" value="_211" />
-              <el-option label="双一流" value="DOUBLE_FIRST_CLASS" />
-              <el-option label="普通高校" value="REGULAR" />
+              <el-option
+                v-for="item in schoolTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           
@@ -299,6 +303,13 @@
     '上海', '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南',
     '湖北', '湖南', '广东', '广西', '海南', '重庆', '四川', '贵州',
     '云南', '西藏', '陕西', '甘肃', '青海', '宁夏', '新疆', '香港', '澳门', '台湾'
+  ]
+
+  const schoolTypeOptions = [
+    { label: '985工程', value: '_985' },
+    { label: '211工程', value: '_211' },
+    { label: '双一流', value: 'DOUBLE_FIRST_CLASS' },
+    { label: '普通高校', value: 'REGULAR' }
   ]
   
   const schoolRules = {
@@ -525,13 +536,8 @@
   }
   
   const getSchoolTypeText = (type) => {
-    const textMap = {
-      '_985': '985工程',
-      '_211': '211工程',
-      'DOUBLE_FIRST_CLASS': '双一流',
-      'REGULAR': '普通高校'
-    }
-    return textMap[type] || type
+    const map = Object.fromEntries(schoolTypeOptions.map(item => [item.value, item.label]))
+    return map[type] || type
   }
   
   onMounted(() => {
