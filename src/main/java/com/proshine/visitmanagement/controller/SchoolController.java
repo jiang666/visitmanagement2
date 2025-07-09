@@ -4,6 +4,7 @@ import com.proshine.visitmanagement.dto.request.SchoolRequest;
 import com.proshine.visitmanagement.dto.response.ApiResponse;
 import com.proshine.visitmanagement.dto.response.PageResponse;
 import com.proshine.visitmanagement.dto.response.SchoolResponse;
+import com.proshine.visitmanagement.dto.response.SchoolDepartmentTreeResponse;
 import com.proshine.visitmanagement.service.SchoolService;
 import com.proshine.visitmanagement.util.ExcelUtils;
 import com.proshine.visitmanagement.util.ValidationUtils;
@@ -243,6 +244,18 @@ public class SchoolController {
         Map<String, List<String>> provincesCities = schoolService.getProvincesCities();
 
         return ApiResponse.success(provincesCities, "获取省份城市列表成功");
+    }
+
+    /**
+     * 获取学校-院系树结构
+     */
+    @GetMapping("/tree")
+    public ApiResponse<List<SchoolDepartmentTreeResponse>> getSchoolDepartmentTree(Authentication authentication) {
+        log.debug("获取学校-院系树结构");
+
+        List<SchoolDepartmentTreeResponse> tree = schoolService.getSchoolDepartmentTree(authentication);
+
+        return ApiResponse.success(tree, "获取学校院系树成功");
     }
 
     /**
