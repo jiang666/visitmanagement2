@@ -328,29 +328,26 @@
   })
 
   const refreshDepartments = async (schoolId) => {
-      const refreshDepartments = async (schoolId) => {
-        const row = tableData.value.find((s) => s.id === schoolId)
-        if (!row) return
+    const row = tableData.value.find((s) => s.id === schoolId)
+    if (!row) return
 
-        try {
-          const res = await getDepartmentsBySchool(schoolId)
-          row.departments = res.data
+    try {
+      const res = await getDepartmentsBySchool(schoolId)
+      row.departments = res.data
 
-          // 强制刷新展开视图
-          if (schoolTableRef.value) {
-            const lazyMap = schoolTableRef.value.store.states.lazyTreeNodeMap.value
-            lazyMap[schoolId] = undefined
-            schoolTableRef.value.toggleRowExpansion(row, false)
-            setTimeout(() => {
-              schoolTableRef.value.toggleRowExpansion(row, true)
-            }, 50)
-          }
-        } catch (err) {
-          console.error('刷新院系失败:', err)
-        }
+      if (schoolTableRef.value) {
+        const map = schoolTableRef.value.store.states.lazyTreeNodeMap.value
+        map[schoolId] = undefined
+        schoolTableRef.value.toggleRowExpansion(row, false)
+        setTimeout(() => {
+          schoolTableRef.value.toggleRowExpansion(row, true)
+        }, 50)
       }
+    } catch (err) {
+      console.error('刷新院系失败:', err)
     }
-  }
+}
+
   
   const provinceOptions = [
     '北京', '天津', '河北', '山西', '内蒙古', '辽宁', '吉林', '黑龙江',
@@ -401,6 +398,7 @@
   }
   
   const loadDepartments = async (tree, treeNode, resolve) => {
+    console.log('\uD83D\uDC4D \u6B63\u5728\u52A0\u8F7D\u9662\u7CFB\u4FE1\u606F:', tree.id)
     try {
       const response = await getDepartmentsBySchool(tree.id)
       tree.departments = response.data
