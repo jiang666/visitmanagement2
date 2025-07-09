@@ -346,7 +346,8 @@
     } catch (err) {
       console.error('刷新院系失败:', err)
     }
-  }
+}
+
   
   const provinceOptions = [
     '北京', '天津', '河北', '山西', '内蒙古', '辽宁', '吉林', '黑龙江',

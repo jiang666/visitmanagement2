@@ -68,4 +68,6 @@ export function getUsersByRole(role) {
       page: 0,
       size: 1000
     }
-  })}
+  })
+}
+
