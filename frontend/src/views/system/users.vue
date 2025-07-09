@@ -358,7 +358,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
       submitting.value = true
       try {
         if (isEdit.value) {
-          await updateUser(userForm.id, userForm)
+          const payload = { ...userForm }
+          if (!payload.password) {
+            delete payload.password
+          }
+          await updateUser(userForm.id, payload)
           ElMessage.success('更新成功')
         } else {
           await createUser(userForm)

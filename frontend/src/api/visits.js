@@ -79,5 +79,4 @@ export function exportVisits(params) {
     return request({
       url: `/visit-records/customer/${customerId}`,
       method: 'get'
-    })
-  }
+    })  }

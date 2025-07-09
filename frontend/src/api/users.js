@@ -17,10 +17,14 @@ export function createUser(data) {
 }
 
 export function updateUser(id, data) {
+  const payload = { ...data }
+  if (!payload.password) {
+    delete payload.password
+  }
   return request({
     url: `/users/${id}`,
     method: 'put',
-    data
+    data: payload
   })
 }
 
