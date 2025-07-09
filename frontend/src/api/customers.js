@@ -55,10 +55,13 @@ export function exportCustomers(params) {
   })
 }
 
-export function searchCustomers(params) {
+export function searchCustomers(params = {}) {
+  const { keyword, page = 1, size = 10 } = params
+  if (!keyword || !keyword.trim()) {
+    return Promise.resolve({ data: { content: [] } })
+  }
   return request({
     url: '/customers/search',
     method: 'get',
-    params
-  })
-}
+    params: { keyword: keyword.trim(), page, size }
+  })}
