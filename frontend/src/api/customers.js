@@ -57,11 +57,13 @@ export function exportCustomers(params) {
 
 export function searchCustomers(params = {}) {
   const { keyword, page = 1, size = 10 } = params
-  if (!keyword || !keyword.trim()) {
+  const trimmed = typeof keyword === 'string' ? keyword.trim() : ''
+  if (!trimmed || trimmed.length < 2 || /^\d+$/.test(trimmed)) {
     return Promise.resolve({ data: { content: [] } })
   }
   return request({
     url: '/customers/search',
     method: 'get',
-    params: { keyword: keyword.trim(), page, size }
-  })}
+    params: { keyword: trimmed, page, size }
+  })
+}
