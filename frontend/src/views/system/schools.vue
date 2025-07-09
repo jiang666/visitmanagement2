@@ -77,7 +77,14 @@
         </div>
         
         <!-- 数据表格 -->
-        <el-table v-loading="loading" :data="tableData" row-key="id" lazy :load="loadDepartments">
+        <el-table
+          ref="schoolTableRef"
+          v-loading="loading"
+          :data="tableData"
+          row-key="id"
+          lazy
+          :load="loadDepartments"
+        >
           <el-table-column type="expand">
             <template #default="{ row }">
               <div class="expand-content">
@@ -278,6 +285,7 @@
   
   const loading = ref(false)
   const tableData = ref([])
+  const schoolTableRef = ref()
   
   const schoolDialogVisible = ref(false)
   const departmentDialogVisible = ref(false)
@@ -320,13 +328,26 @@
   })
 
   const refreshDepartments = async (schoolId) => {
-    const school = tableData.value.find((s) => s.id === schoolId)
-    if (school) {
-      try {
-        const res = await getDepartmentsBySchool(schoolId)
-        school.departments = res.data
-      } catch (err) {
-        console.error('刷新院系失败:', err)
+      const refreshDepartments = async (schoolId) => {
+        const row = tableData.value.find((s) => s.id === schoolId)
+        if (!row) return
+
+        try {
+          const res = await getDepartmentsBySchool(schoolId)
+          row.departments = res.data
+
+          // 强制刷新展开视图
+          if (schoolTableRef.value) {
+            const lazyMap = schoolTableRef.value.store.states.lazyTreeNodeMap.value
+            lazyMap[schoolId] = undefined
+            schoolTableRef.value.toggleRowExpansion(row, false)
+            setTimeout(() => {
+              schoolTableRef.value.toggleRowExpansion(row, true)
+            }, 50)
+          }
+        } catch (err) {
+          console.error('刷新院系失败:', err)
+        }
       }
     }
   }
