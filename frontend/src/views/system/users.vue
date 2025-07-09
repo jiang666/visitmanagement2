@@ -15,9 +15,12 @@
             
             <el-form-item label="角色">
               <el-select v-model="searchForm.role" placeholder="全部角色" clearable>
-                <el-option label="管理员" value="ADMIN" />
-                <el-option label="经理" value="MANAGER" />
-                <el-option label="销售" value="SALES" />
+                <el-option
+                  v-for="item in roleOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
             
@@ -196,9 +199,12 @@
           
           <el-form-item label="角色" prop="role">
             <el-select v-model="userForm.role" placeholder="请选择角色" style="width: 100%">
-              <el-option label="管理员" value="ADMIN" />
-              <el-option label="经理" value="MANAGER" />
-              <el-option label="销售" value="SALES" />
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           
@@ -233,8 +239,14 @@ import {
   resetUserPassword
 } from '@/api/users'
 import { ElMessage, ElMessageBox } from 'element-plus'
-  
+
   const userStore = useUserStore()
+
+  const roleOptions = [
+    { label: '管理员', value: 'ADMIN' },
+    { label: '经理', value: 'MANAGER' },
+    { label: '销售', value: 'SALES' }
+  ]
   
   const loading = ref(false)
   const dialogVisible = ref(false)
@@ -248,8 +260,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
   
   const searchForm = reactive({
     keyword: '',
-    role: '',
-    status: '',
+    role: null,
+    status: null,
     department: ''
   })
   
@@ -321,8 +333,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
   const handleReset = () => {
     Object.assign(searchForm, {
       keyword: '',
-      role: '',
-      status: '',
+      role: null,
+      status: null,
       department: ''
     })
     pagination.page = 1
