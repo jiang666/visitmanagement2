@@ -23,9 +23,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Ensure default admin user exists
-        if (!userRepository.existsByUsername("admin")) {
-            log.info("No admin user found, creating default admin account");
+        if (userRepository.count() == 0 && !userRepository.existsByUsername("admin")) {
             User admin = new User();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("123456"));
