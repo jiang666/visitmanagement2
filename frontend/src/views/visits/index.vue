@@ -26,7 +26,12 @@
           </el-form-item>
 
           <el-form-item label="状态">
-            <el-select v-model="searchForm.status" placeholder="全部状态" clearable>
+            <el-select
+              v-model="searchForm.status"
+              placeholder="全部状态"
+              clearable
+              class="standard-select"
+            >
               <el-option label="已安排" value="SCHEDULED" />
               <el-option label="已完成" value="COMPLETED" />
               <el-option label="已取消" value="CANCELLED" />
@@ -35,7 +40,12 @@
           </el-form-item>
 
           <el-form-item label="意向等级">
-            <el-select v-model="searchForm.intentLevel" placeholder="全部等级" clearable>
+            <el-select
+              v-model="searchForm.intentLevel"
+              placeholder="全部等级"
+              clearable
+              class="standard-select"
+            >
               <el-option label="A类" value="A" />
               <el-option label="B类" value="B" />
               <el-option label="C类" value="C" />
