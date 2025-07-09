@@ -328,23 +328,27 @@
   })
 
   const refreshDepartments = async (schoolId) => {
-    const row = tableData.value.find((s) => s.id === schoolId)
-    if (!row) return
+      const refreshDepartments = async (schoolId) => {
+        const row = tableData.value.find((s) => s.id === schoolId)
+        if (!row) return
 
-    try {
-      const res = await getDepartmentsBySchool(schoolId)
-      row.departments = res.data
+        try {
+          const res = await getDepartmentsBySchool(schoolId)
+          row.departments = res.data
 
-      if (schoolTableRef.value) {
-        const map = schoolTableRef.value.store.states.lazyTreeNodeMap.value
-        map[schoolId] = undefined
-        schoolTableRef.value.toggleRowExpansion(row, false)
-        setTimeout(() => {
-          schoolTableRef.value.toggleRowExpansion(row, true)
-        }, 50)
+          // 强制刷新展开视图
+          if (schoolTableRef.value) {
+            const lazyMap = schoolTableRef.value.store.states.lazyTreeNodeMap.value
+            lazyMap[schoolId] = undefined
+            schoolTableRef.value.toggleRowExpansion(row, false)
+            setTimeout(() => {
+              schoolTableRef.value.toggleRowExpansion(row, true)
+            }, 50)
+          }
+        } catch (err) {
+          console.error('刷新院系失败:', err)
+        }
       }
-    } catch (err) {
-      console.error('刷新院系失败:', err)
     }
   }
   
