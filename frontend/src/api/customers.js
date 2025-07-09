@@ -65,4 +65,5 @@ export function searchCustomers(params = {}) {
     url: '/customers/search',
     method: 'get',
     params: { keyword: trimmed, page, size }
-  })}
+  })
+}
