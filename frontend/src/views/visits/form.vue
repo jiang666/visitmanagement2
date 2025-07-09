@@ -29,6 +29,7 @@
                   filterable
                   remote
                   :remote-method="searchCustomers"
+                  @input="searchCustomers"
                   style="width: 100%"
                   class="standard-select"
                 >
@@ -282,14 +283,26 @@
     status: [{ required: true, message: '请选择拜访状态', trigger: 'change' }]
   }
   
+  let searchTimeout
   const searchCustomers = async (query) => {
-    if (!query) return
-    try {
-      const response = await searchCustomersApi({ keyword: query })
-      customerOptions.value = response.data.content || []
-    } catch (error) {
-      console.error('搜索客户失败:', error)
+    const keyword = typeof query === 'string' ? query.trim() : ''
+    if (!keyword || keyword.length < 2 || /^\d+$/.test(keyword)) {
+      customerOptions.value = []
+      return
     }
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(async () => {
+      try {
+        const response = await searchCustomersApi({
+          keyword,
+          page: 1,
+          size: 20
+        })
+        customerOptions.value = response.data?.content || []
+      } catch (error) {
+        customerOptions.value = []
+      }
+    }, 300)
   }
   
   const loadData = async () => {
