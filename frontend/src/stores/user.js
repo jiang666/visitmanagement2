@@ -16,10 +16,15 @@ export const useUserStore = defineStore('user', () => {
     loading.value = true
     try {
       const response = await login(loginForm)
-      const { token: authToken, user: userInfo } = response.data
-      
+      const {
+        token: authToken,
+        userId,
+        tokenType,
+        ...userInfo
+      } = response.data
+
       token.value = authToken
-      user.value = userInfo
+      user.value = { id: userId, tokenType, ...userInfo }
       setToken(authToken)
       
       ElMessage.success('登录成功')
