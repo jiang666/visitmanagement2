@@ -6,7 +6,7 @@ import request from '@/utils/request'
  */
 export function getVisitList(params) {
   return request({
-    url: '/visits',
+    url: '/visit-records',
     method: 'get',
     params
   })
@@ -17,7 +17,7 @@ export function getVisitList(params) {
  */
 export function getVisitDetail(id) {
   return request({
-    url: `/visits/${id}`,
+    url: `/visit-records/${id}`,
     method: 'get'
   })
 }
@@ -27,7 +27,7 @@ export function getVisitDetail(id) {
  */
 export function createVisit(data) {
   return request({
-    url: '/visits',
+    url: '/visit-records',
     method: 'post',
     data
   })
@@ -38,7 +38,7 @@ export function createVisit(data) {
  */
 export function updateVisit(id, data) {
   return request({
-    url: `/visits/${id}`,
+    url: `/visit-records/${id}`,
     method: 'put',
     data
   })
@@ -49,7 +49,7 @@ export function updateVisit(id, data) {
  */
 export function deleteVisit(id) {
   return request({
-    url: `/visits/${id}`,
+    url: `/visit-records/${id}`,
     method: 'delete'
   })
 }
@@ -59,7 +59,7 @@ export function deleteVisit(id) {
  */
 export function batchDeleteVisits(ids) {
   return request({
-    url: '/visits/batch-delete',
+    url: '/visit-records/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -69,7 +69,7 @@ export function batchDeleteVisits(ids) {
  */
 export function exportVisits(params) {
     return request({
-      url: '/visits/export',
+      url: '/visit-records/export',
       method: 'get',
       params,
       responseType: 'blob'
@@ -77,7 +77,6 @@ export function exportVisits(params) {
   }
   export function getCustomerVisits(customerId) {
     return request({
-      url: `/visits/customer/${customerId}`,
+      url: `/visit-records/customer/${customerId}`,
       method: 'get'
-    })
-  }
+    })  }

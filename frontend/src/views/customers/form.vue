@@ -107,7 +107,12 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="影响力等级" prop="influenceLevel">
-                <el-select v-model="form.influenceLevel" placeholder="请选择" style="width: 100%">
+                <el-select
+                  v-model="form.influenceLevel"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option label="高影响力" value="HIGH" />
                   <el-option label="中等影响力" value="MEDIUM" />
                   <el-option label="低影响力" value="LOW" />
@@ -117,7 +122,12 @@
             
             <el-col :span="12">
               <el-form-item label="决策权力" prop="decisionPower">
-                <el-select v-model="form.decisionPower" placeholder="请选择" style="width: 100%">
+                <el-select
+                  v-model="form.decisionPower"
+                  placeholder="请选择"
+                  style="width: 100%"
+                  class="standard-select"
+                >
                   <el-option label="决策者" value="DECISION_MAKER" />
                   <el-option label="影响者" value="INFLUENCER" />
                   <el-option label="使用者" value="USER" />
