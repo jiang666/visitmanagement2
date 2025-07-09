@@ -25,7 +25,7 @@
             <el-menu-item
               v-for="child in getVisibleChildren(route)"
               :key="child.path"
-              :index="child.path"
+              :index="`${route.path}/${child.path}`"
             >
               {{ child.meta.title }}
             </el-menu-item>
@@ -108,9 +108,11 @@ const activeMenuPath = computed(() => {
 })
 
 // 获取菜单路由
+// 只使用最顶层的路由作为菜单数据，避免子路由被重复渲染
 const menuRoutes = computed(() => {
-  return router.getRoutes().filter(r => 
-    r.meta?.title && 
+  const rootRoutes = router.options.routes || []
+  return rootRoutes.filter(r =>
+    r.meta?.title &&
     !r.meta?.hidden &&
     r.path !== '/login' &&
     (!r.meta?.roles || r.meta.roles.includes(userStore.user?.role))
