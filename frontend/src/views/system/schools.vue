@@ -318,6 +318,18 @@
     address: '',
     description: ''
   })
+
+  const refreshDepartments = async (schoolId) => {
+    const school = tableData.value.find((s) => s.id === schoolId)
+    if (school) {
+      try {
+        const res = await getDepartmentsBySchool(schoolId)
+        school.departments = res.data
+      } catch (err) {
+        console.error('刷新院系失败:', err)
+      }
+    }
+  }
   
   const provinceOptions = [
     '北京', '天津', '河北', '山西', '内蒙古', '辽宁', '吉林', '黑龙江',
@@ -493,6 +505,7 @@
           ElMessage.success('创建成功')
         }
         departmentDialogVisible.value = false
+        await refreshDepartments(departmentForm.schoolId)
         loadData()
       } catch (error) {
         ElMessage.error(error.message || '操作失败')
@@ -510,6 +523,7 @@
       
       await deleteDepartment(dept.id)
       ElMessage.success('删除成功')
+      await refreshDepartments(dept.schoolId)
       loadData()
     } catch (error) {
       if (error !== 'cancel') {
