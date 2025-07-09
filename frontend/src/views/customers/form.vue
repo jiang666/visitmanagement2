@@ -162,6 +162,7 @@
   <script setup>
   import { ref, reactive, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { ElMessage } from 'element-plus'
   import { getCustomerDetail, createCustomer, updateCustomer } from '@/api/customers'
   import { getSchoolDepartmentTree } from '@/api/schools'
   
@@ -203,7 +204,7 @@
     value: 'id',
     label: 'name',
     children: 'departments',
-    emitPath: false,
+    emitPath: true,
     checkStrictly: true
   }
   
