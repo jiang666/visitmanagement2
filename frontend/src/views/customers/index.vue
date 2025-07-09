@@ -14,7 +14,12 @@
             </el-form-item>
             
             <el-form-item label="影响力等级">
-              <el-select v-model="searchForm.influenceLevel" placeholder="全部等级" clearable>
+              <el-select
+                v-model="searchForm.influenceLevel"
+                placeholder="全部等级"
+                clearable
+                class="standard-select"
+              >
                 <el-option label="高影响力" value="HIGH" />
                 <el-option label="中等影响力" value="MEDIUM" />
                 <el-option label="低影响力" value="LOW" />
@@ -22,7 +27,12 @@
             </el-form-item>
             
             <el-form-item label="决策权力">
-              <el-select v-model="searchForm.decisionPower" placeholder="全部类型" clearable>
+              <el-select
+                v-model="searchForm.decisionPower"
+                placeholder="全部类型"
+                clearable
+                class="standard-select"
+              >
                 <el-option label="决策者" value="DECISION_MAKER" />
                 <el-option label="影响者" value="INFLUENCER" />
                 <el-option label="使用者" value="USER" />
@@ -173,8 +183,8 @@
   
   const searchForm = reactive({
     keyword: '',
-    influenceLevel: '',
-    decisionPower: ''
+    influenceLevel: null,
+    decisionPower: null
   })
   
   const pagination = reactive({
@@ -214,8 +224,8 @@
   const handleReset = () => {
     Object.assign(searchForm, {
       keyword: '',
-      influenceLevel: '',
-      decisionPower: ''
+      influenceLevel: null,
+      decisionPower: null
     })
     pagination.page = 1
     loadData()
