@@ -62,7 +62,7 @@ export function searchCustomers(params = {}) {
     return Promise.resolve({ data: { content: [] } })
   }
   return request({
-    url: '/customers/search',
+    url: '/customers',
     method: 'get',
     params: { keyword: trimmed, page, size }
   })
