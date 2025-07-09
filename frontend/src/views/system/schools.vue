@@ -269,6 +269,7 @@
   <script setup>
   import { ref, reactive, onMounted } from 'vue'
   import { Search, Refresh, Plus, Upload, Download } from '@element-plus/icons-vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import {
     getSchoolList, createSchool, updateSchool, deleteSchool,
     getDepartmentsBySchool, createDepartment, updateDepartment, deleteDepartment,
@@ -420,6 +421,9 @@
       if (!valid) return
       
       schoolSubmitting.value = true
+      if (schoolForm.website && !/^https?:\/\//i.test(schoolForm.website)) {
+        schoolForm.website = `https://${schoolForm.website}`
+      }
       try {
         if (isEditSchool.value) {
           await updateSchool(schoolForm.id, schoolForm)
