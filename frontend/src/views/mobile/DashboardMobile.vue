@@ -1,16 +1,18 @@
 <template>
   <MobileLayout title="首页" :showBack="false">
-    <el-card v-for="item in statsCards" :key="item.title" class="stat-card">
-      <div class="stat-row">
-        <el-icon :size="20" :style="{ color: item.color }">
-          <component :is="item.icon" />
-        </el-icon>
-        <div class="info">
-          <div class="value">{{ item.value }}</div>
-          <div class="label">{{ item.title }}</div>
+    <div class="stat-grid">
+      <el-card v-for="item in statsCards" :key="item.title" class="stat-card">
+        <div class="stat-row">
+          <el-icon :size="20" :style="{ color: item.color }">
+            <component :is="item.icon" />
+          </el-icon>
+          <div class="info">
+            <div class="value">{{ item.value }}</div>
+            <div class="label">{{ item.title }}</div>
+          </div>
         </div>
-      </div>
-    </el-card>
+      </el-card>
+    </div>
 
     <el-card style="margin-top:12px">
       <v-chart class="chart" :option="visitTrendOption" />
@@ -35,11 +37,17 @@
       </el-timeline>
       <el-empty v-else description="暂无提醒" />
     </el-card>
+
+    <div class="btn-group">
+      <el-button size="large" type="primary" class="action-btn" @click="router.push('/m/analysis')">查看更多</el-button>
+      <el-button size="large" class="action-btn" @click="router.push('/m/customers/create')">新建客户</el-button>
+    </div>
   </MobileLayout>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import MobileLayout from '@/layout/MobileLayout.vue'
 import { getDashboardData } from '@/api/dashboard'
 import { use } from 'echarts/core'
@@ -84,6 +92,7 @@ const intentDistributionOption = ref({
 })
 
 const reminders = ref([])
+const router = useRouter()
 
 const loadData = async () => {
   const { data } = await getDashboardData()
@@ -112,6 +121,12 @@ onMounted(loadData)
 <style scoped>
 .stat-card {
   margin-bottom: 12px;
+  width: calc(50% - 6px);
+}
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 .stat-row {
   display: flex;
@@ -127,5 +142,14 @@ onMounted(loadData)
 .chart {
   width: 100%;
   height: 260px;
+}
+
+.btn-group {
+  margin-top: 16px;
+}
+.action-btn {
+  border-radius: 12px;
+  width: 100%;
+  margin-bottom: 12px;
 }
 </style>
