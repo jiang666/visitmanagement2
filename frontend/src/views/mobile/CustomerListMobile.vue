@@ -4,17 +4,17 @@
       <el-button text @click="add"><el-icon><Plus /></el-icon></el-button>
     </template>
     <div class="toolbar">
-      <el-input v-model="keyword" placeholder="搜索姓名/职称/学校" clearable class="search-input" />
+      <el-input v-model="keyword" placeholder="输入姓名、职位、学校等" clearable class="search-input" />
       <el-button-group class="action-group">
-        <el-button size="large" type="primary" @click="search">搜索</el-button>
-        <el-button size="large" type="danger" @click="deleteSelected">删除客户</el-button>
+        <el-button size="large" type="primary" class="button-search" @click="search">搜索</el-button>
+        <el-button size="large" type="danger" class="button-delete" @click="deleteSelected">删除客户</el-button>
       </el-button-group>
     </div>
     <el-card v-for="item in list" :key="item.id" class="customer-card">
       <div class="title-row">
         <el-checkbox v-model="selectedIds" :label="item.id" class="card-check" />
         <span @click="view(item)">{{ item.name }}</span>
-        <el-tag size="small" :type="levelType(item.influenceLevel)">{{ item.influenceLevelDescription }}</el-tag>
+        <el-tag size="small" class="customer-tag" :style="tagStyle(item.influenceLevel)">{{ item.influenceLevelDescription }}</el-tag>
       </div>
       <div class="info" @click="view(item)">{{ item.position }} | {{ item.schoolName }}</div>
     </el-card>
@@ -66,10 +66,11 @@ const deleteSelected = async () => {
   }
 }
 
-const levelType = (level) => {
-  if (level === 'HIGH') return 'danger'
-  if (level === 'MEDIUM') return 'warning'
-  return 'info'
+const tagStyle = (level) => {
+  const base = { borderRadius: '6px', padding: '4px 8px', color: '#fff' }
+  if (level === 'HIGH') return { ...base, backgroundColor: '#F56C6C' }
+  if (level === 'MEDIUM') return { ...base, backgroundColor: '#E6A23C' }
+  return base
 }
 
 onMounted(load)
@@ -77,18 +78,31 @@ onMounted(load)
 
 <style scoped>
 .toolbar {
+  margin-top: 16px;
   margin-bottom: 12px;
 }
 .search-input {
   margin-bottom: 8px;
+  width: 100%;
+  font-size: 14px;
+  height: 40px;
+  border-radius: 8px;
 }
 .action-group {
   width: 100%;
   margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+}
+.button-search,
+.button-delete {
+  width: 48%;
 }
 .customer-card {
-  margin-bottom: 10px;
-  box-shadow: var(--el-box-shadow-lighter);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  padding: 12px 16px;
 }
 .title-row {
   display: flex;
@@ -103,5 +117,8 @@ onMounted(load)
 .info {
   font-size: 12px;
   color: #666;
+}
+.customer-tag {
+  float: right;
 }
 </style>
