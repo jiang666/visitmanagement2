@@ -24,6 +24,7 @@
           <el-col :span="12">
             <el-form-item label="客户" prop="customerId">
               <el-select
+                  id="customerId"
                   v-model="form.customerId"
                   placeholder="请输入客户姓名进行搜索"
                   filterable
@@ -49,6 +50,7 @@
           <el-col :span="12">
             <el-form-item label="拜访日期" prop="visitDate">
               <el-date-picker
+                  id="visitDate"
                   v-model="form.visitDate"
                   type="date"
                   placeholder="选择日期"
@@ -64,6 +66,7 @@
           <el-col :span="12">
             <el-form-item label="拜访时间" prop="visitTime">
               <el-time-picker
+                  id="visitTime"
                   v-model="form.visitTime"
                   placeholder="选择时间"
                   style="width: 100%"
@@ -76,6 +79,7 @@
           <el-col :span="12">
             <el-form-item label="拜访时长" prop="durationMinutes">
               <el-input-number
+                  id="durationMinutes"
                   v-model="form.durationMinutes"
                   :min="1"
                   :max="1440"
@@ -90,6 +94,7 @@
           <el-col :span="12">
             <el-form-item label="拜访类型" prop="visitType">
               <el-select
+                  id="visitType"
                   v-model="form.visitType"
                   placeholder="请选择"
                   style="width: 100%"
@@ -107,6 +112,7 @@
           <el-col :span="12">
             <el-form-item label="拜访状态" prop="status">
               <el-select
+                  id="status"
                   v-model="form.status"
                   placeholder="请选择"
                   style="width: 100%"
@@ -125,6 +131,7 @@
           <el-col :span="12">
             <el-form-item label="意向等级" prop="intentLevel">
               <el-select
+                  id="intentLevel"
                   v-model="form.intentLevel"
                   placeholder="请选择"
                   style="width: 100%"
@@ -140,17 +147,18 @@
 
           <el-col :span="12">
             <el-form-item label="拜访评分" prop="rating">
-              <el-rate v-model="form.rating" :max="5" show-score />
+              <el-rate id="rating" v-model="form.rating" :max="5" show-score />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="拜访地点" prop="location">
-          <el-input v-model="form.location" placeholder="请输入拜访地点" />
+          <el-input id="location" v-model="form.location" placeholder="请输入拜访地点" />
         </el-form-item>
 
         <el-form-item label="可办事项" prop="businessItems">
           <el-input
+              id="businessItems"
               v-model="form.businessItems"
               type="textarea"
               :rows="3"
@@ -160,6 +168,7 @@
 
         <el-form-item label="需求痛点" prop="painPoints">
           <el-input
+              id="painPoints"
               v-model="form.painPoints"
               type="textarea"
               :rows="3"
@@ -169,6 +178,7 @@
 
         <el-form-item label="竞品信息" prop="competitors">
           <el-input
+              id="competitors"
               v-model="form.competitors"
               type="textarea"
               :rows="3"
@@ -179,19 +189,20 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="预算范围" prop="budgetRange">
-              <el-input v-model="form.budgetRange" placeholder="如：50-100万" />
+              <el-input id="budgetRange" v-model="form.budgetRange" placeholder="如：50-100万" />
             </el-form-item>
           </el-col>
 
           <el-col :span="12">
             <el-form-item label="决策时间线" prop="decisionTimeline">
-              <el-input v-model="form.decisionTimeline" placeholder="如：3个月内" />
+              <el-input id="decisionTimeline" v-model="form.decisionTimeline" placeholder="如：3个月内" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="下一步计划" prop="nextStep">
           <el-input
+              id="nextStep"
               v-model="form.nextStep"
               type="textarea"
               :rows="3"
@@ -203,6 +214,7 @@
           <el-col :span="12">
             <el-form-item label="跟进日期" prop="followUpDate">
               <el-date-picker
+                  id="followUpDate"
                   v-model="form.followUpDate"
                   type="date"
                   placeholder="选择跟进日期"
@@ -215,17 +227,18 @@
 
           <el-col :span="12">
             <el-form-item label="天气情况" prop="weather">
-              <el-input v-model="form.weather" placeholder="如：晴天" />
+              <el-input id="weather" v-model="form.weather" placeholder="如：晴天" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="留下资料" prop="materialsLeft">
-          <el-input v-model="form.materialsLeft" placeholder="请输入留下的资料" />
+          <el-input id="materialsLeft" v-model="form.materialsLeft" placeholder="请输入留下的资料" />
         </el-form-item>
 
         <el-form-item label="拜访备注" prop="notes">
           <el-input
+              id="notes"
               v-model="form.notes"
               type="textarea"
               :rows="4"
@@ -234,7 +247,7 @@
         </el-form-item>
 
         <el-form-item label="其他">
-          <el-checkbox v-model="form.wechatAdded">已添加微信</el-checkbox>
+          <el-checkbox id="wechatAdded" v-model="form.wechatAdded">已添加微信</el-checkbox>
         </el-form-item>
       </el-form>
     </el-card>
