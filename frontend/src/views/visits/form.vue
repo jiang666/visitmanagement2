@@ -147,7 +147,12 @@
 
           <el-col :span="12">
             <el-form-item label="拜访评分" prop="rating">
-              <el-rate id="rating" v-model="form.rating" :max="5" show-score />
+              <el-rate
+                  id="rating"
+                  v-model="form.rating"
+                  :max="5"
+                  show-score
+              />
             </el-form-item>
           </el-col>
         </el-row>
