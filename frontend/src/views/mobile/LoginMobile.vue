@@ -20,8 +20,11 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
+import { useRouter, useRoute } from 'vue-router'
 
 const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
 const formRef = ref()
 const form = reactive({ username: 'admin', password: '123456' })
 const rules = {
@@ -33,6 +36,12 @@ const submit = async () => {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       await userStore.userLogin(form)
+      // 根据当前路径决定跳转到移动端还是 PC 仪表盘
+      if (route.path.startsWith('/m')) {
+        router.push('/m/dashboard')
+      } else {
+        router.push('/dashboard')
+      }
     }
   })
 }
