@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { login, logout, getUserInfo } from '@/api/auth'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+
+const USER_KEY = 'visit_management_user'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
 export const useUserStore = defineStore('user', () => {
@@ -26,7 +28,8 @@ export const useUserStore = defineStore('user', () => {
       token.value = authToken
       user.value = { id: userId, tokenType, ...userInfo }
       setToken(authToken)
-      
+      localStorage.setItem(USER_KEY, JSON.stringify(user.value))
+
       ElMessage.success('登录成功')
       router.push('/')
     } catch (error) {
@@ -47,6 +50,7 @@ export const useUserStore = defineStore('user', () => {
       token.value = null
       user.value = null
       removeToken()
+      localStorage.removeItem(USER_KEY)
       router.push('/login')
     }
   }
@@ -71,11 +75,18 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const initUser = () => {
+    token.value = getToken() || ''
+    const stored = localStorage.getItem(USER_KEY)
+    user.value = stored ? JSON.parse(stored) : null
+  }
+
   return {
     token,
     user,
     loading,
     isAuthenticated,
+    initUser,
     userLogin,
     userLogout,
     fetchUserInfo,
