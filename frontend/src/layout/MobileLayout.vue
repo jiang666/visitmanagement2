@@ -59,7 +59,7 @@ const isActive = (path) => {
   display: flex;
   align-items: center;
   padding: 0 12px;
-  height: 50px;
+  height: 56px;
   background: #409EFF;
   color: #fff;
 }
@@ -68,17 +68,28 @@ const isActive = (path) => {
   flex: 1;
   text-align: center;
   font-weight: bold;
+  font-size: 18px;
+}
+.back-btn {
+  font-size: 20px;
 }
 
 .mobile-main {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
+  padding-bottom: 72px;
 }
 
 .mobile-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
   display: flex;
-  border-top: 1px solid #e0e0e0;
+  background: #ffffff;
+  border-top: 1px solid #e4e7ed;
 }
 
 .tab-item {
@@ -86,6 +97,7 @@ const isActive = (path) => {
   text-align: center;
   padding: 8px 0;
   color: #666;
+  font-size: 12px;
   transition: color 0.3s, transform 0.3s;
 }
 
