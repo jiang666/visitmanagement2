@@ -43,7 +43,7 @@
   
       <!-- 统计卡片 -->
       <el-row :gutter="20" class="stats-row">
-        <el-col :span="6" v-for="item in statsCards" :key="item.title">
+        <el-col :xs="12" :sm="6" :md="6" :lg="6" v-for="item in statsCards" :key="item.title">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-icon" :style="{ background: item.color }">
@@ -65,7 +65,7 @@
       <!-- 图表区域 -->
       <el-row :gutter="20" class="charts-row">
         <!-- 拜访趋势图 -->
-        <el-col :span="12">
+        <el-col :xs="24" :md="12">
           <el-card title="拜访趋势分析">
             <template #header>
               <div class="card-header">
@@ -82,7 +82,7 @@
         </el-col>
         
         <!-- 意向分布图 -->
-        <el-col :span="12">
+        <el-col :xs="24" :md="12">
           <el-card title="意向等级分布">
             <template #header>
               <span>意向等级分布</span>
@@ -94,7 +94,7 @@
   
       <el-row :gutter="20" class="charts-row">
         <!-- 销售业绩排名 -->
-        <el-col :span="12">
+        <el-col :xs="24" :md="12">
           <el-card title="销售业绩排名">
             <template #header>
               <span>销售业绩排名</span>
@@ -104,7 +104,7 @@
         </el-col>
         
         <!-- 学校拜访排名 -->
-        <el-col :span="12">
+        <el-col :xs="24" :md="12">
           <el-card title="学校拜访排名">
             <template #header>
               <span>学校拜访排名</span>
@@ -448,10 +448,28 @@
   .analysis {
     .filter-card {
       margin-bottom: 20px;
+
+      @media (max-width: 768px) {
+        .el-form {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .el-form-item {
+          margin-right: 0;
+          width: 100%;
+        }
+      }
     }
     
     .stats-row {
       margin-bottom: 20px;
+
+      @media (max-width: 768px) {
+        .el-col {
+          width: 50%;
+        }
+      }
       
       .stat-card {
         .stat-content {
@@ -505,6 +523,12 @@
     
     .charts-row {
       margin-bottom: 20px;
+
+      @media (max-width: 768px) {
+        .el-col {
+          width: 100%;
+        }
+      }
       
       .chart {
         width: 100%;
@@ -513,6 +537,7 @@
     }
     
     .report-card {
+      overflow-x: auto;
       .card-header {
         display: flex;
         justify-content: space-between;

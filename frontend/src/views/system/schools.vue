@@ -152,13 +152,14 @@
       </el-table>
 
       <!-- 分页 -->
-      <div class="pagination">
+      <div class="pagination" :class="{ 'mobile-pagination': isMobile }">
         <el-pagination
             v-model:current-page="pagination.page"
             v-model:page-size="pagination.size"
             :total="pagination.total"
-            :page-sizes="[10, 20, 50, 100]"
+            :page-sizes="isMobile ? [10, 20] : [10, 20, 50, 100]"
             layout="total, sizes, prev, pager, next, jumper"
+            :small="isMobile"
             @size-change="loadData"
             @current-change="loadData"
         />
@@ -278,7 +279,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { Search, Refresh, Plus, Upload, Download } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -303,6 +304,11 @@ const departmentSubmitting = ref(false)
 
 const schoolFormRef = ref()
 const departmentFormRef = ref()
+
+const isMobile = ref(false)
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 768
+}
 
 const searchForm = reactive({
   keyword: '',
@@ -628,7 +634,13 @@ const getSchoolTypeText = (type) => {
 }
 
 onMounted(() => {
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
   loadData()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize)
 })
 </script>
 
@@ -639,6 +651,18 @@ onMounted(() => {
     padding: 20px;
     background: #f5f7fa;
     border-radius: 4px;
+
+    @media (max-width: 768px) {
+      padding: 10px;
+      .el-form {
+        display: flex;
+        flex-direction: column;
+      }
+      .el-form-item {
+        margin-right: 0;
+        width: 100%;
+      }
+    }
   }
 
   .action-bar {
@@ -646,6 +670,22 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+
+      .action-left {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .el-button {
+          width: 100%;
+        }
+      }
+    }
   }
 
   .expand-content {
@@ -675,6 +715,14 @@ onMounted(() => {
   .pagination {
     margin-top: 20px;
     text-align: right;
+
+    &.mobile-pagination {
+      text-align: center;
+
+      .el-pagination {
+        justify-content: center;
+      }
+    }
   }
 }
 </style>

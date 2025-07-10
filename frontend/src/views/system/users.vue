@@ -161,13 +161,14 @@
         </el-table>
         
         <!-- 分页 -->
-        <div class="pagination">
+        <div class="pagination" :class="{ 'mobile-pagination': isMobile }">
           <el-pagination
             v-model:current-page="pagination.page"
             v-model:page-size="pagination.size"
             :total="pagination.total"
-            :page-sizes="[10, 20, 50, 100]"
+            :page-sizes="isMobile ? [10, 20] : [10, 20, 50, 100]"
             layout="total, sizes, prev, pager, next, jumper"
+            :small="isMobile"
             @size-change="loadData"
             @current-change="loadData"
           />
@@ -239,7 +240,7 @@
   </template>
   
   <script setup>
-  import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
   import { useUserStore } from '@/stores/user'
   import {
     Search, Refresh, Plus, Delete
@@ -263,12 +264,17 @@ import { ElMessage, ElMessageBox } from 'element-plus'
     { label: '销售', value: 'SALES' }
   ]
   
-  const loading = ref(false)
-  const dialogVisible = ref(false)
-  const submitting = ref(false)
-  const tableData = ref([])
-  const selectedRows = ref([])
-  const formRef = ref()
+const loading = ref(false)
+const dialogVisible = ref(false)
+const submitting = ref(false)
+const tableData = ref([])
+const selectedRows = ref([])
+const formRef = ref()
+
+const isMobile = ref(false)
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth <= 768
+}
   
   const currentUserId = computed(() => userStore.user?.id)
   const isEdit = ref(false)
@@ -505,9 +511,15 @@ import { ElMessage, ElMessageBox } from 'element-plus'
     return new Date(dateTime).toLocaleString('zh-CN')
   }
   
-  onMounted(() => {
-    loadData()
-  })
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+  loadData()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize)
+})
   </script>
   
   <style lang="scss" scoped>
@@ -517,6 +529,18 @@ import { ElMessage, ElMessageBox } from 'element-plus'
       padding: 20px;
       background: #f5f7fa;
       border-radius: 4px;
+
+      @media (max-width: 768px) {
+        padding: 10px;
+        .el-form {
+          display: flex;
+          flex-direction: column;
+        }
+        .el-form-item {
+          margin-right: 0;
+          width: 100%;
+        }
+      }
     }
     
     .action-bar {
@@ -524,6 +548,22 @@ import { ElMessage, ElMessageBox } from 'element-plus'
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 10px;
+
+        .action-left {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .el-button {
+            width: 100%;
+          }
+        }
+      }
     }
     
     .user-info {
@@ -548,6 +588,14 @@ import { ElMessage, ElMessageBox } from 'element-plus'
     .pagination {
       margin-top: 20px;
       text-align: right;
+
+      &.mobile-pagination {
+        text-align: center;
+
+        .el-pagination {
+          justify-content: center;
+        }
+      }
     }
 
     .actions {
