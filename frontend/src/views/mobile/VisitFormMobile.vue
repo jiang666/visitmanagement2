@@ -60,7 +60,7 @@ const submit = async () => {
   } else {
     await createVisit(form)
   }
-  router.back()
+  router.push('/m/visits/list')
 }
 </script>
 

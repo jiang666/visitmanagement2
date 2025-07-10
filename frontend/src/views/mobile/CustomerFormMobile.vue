@@ -68,7 +68,7 @@ const submit = async () => {
   } else {
     await createCustomer(form)
   }
-  router.back()
+  router.push('/m/customers/list')
 }
 </script>
 
