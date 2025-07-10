@@ -10,8 +10,17 @@
       <el-form-item label="类型" prop="visitType">
         <el-select v-model="form.visitType" style="width:100%">
           <el-option label="电话" value="PHONE" />
-          <el-option label="上门" value="VISIT" />
+          <el-option label="上门拜访" value="VISIT" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="评分" prop="rating">
+        <el-rate v-model="form.rating" />
+      </el-form-item>
+      <el-form-item label="内容" prop="content">
+        <el-input type="textarea" v-model="form.content" rows="3" />
+      </el-form-item>
+      <el-form-item label="反馈" prop="feedback">
+        <el-input type="textarea" v-model="form.feedback" rows="3" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" style="width:100%" @click="submit">保存</el-button>
@@ -29,7 +38,14 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const formRef = ref()
-const form = reactive({ customerId: '', visitDate: '', visitType: 'PHONE' })
+const form = reactive({
+  customerId: '',
+  visitDate: '',
+  visitType: 'PHONE',
+  rating: 0,
+  content: '',
+  feedback: ''
+})
 
 if (route.params.id) {
   getVisitDetail(route.params.id).then(({ data }) => Object.assign(form, data))

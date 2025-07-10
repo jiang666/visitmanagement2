@@ -1,5 +1,8 @@
 <template>
   <MobileLayout title="客户列表">
+    <template #header-right>
+      <el-button text @click="add"><el-icon><Plus /></el-icon></el-button>
+    </template>
     <el-card v-for="item in list" :key="item.id" class="mb-2" @click="view(item)">
       <div class="title-row">{{ item.name }}</div>
       <div class="info">{{ item.schoolName }} {{ item.departmentName }}</div>
@@ -12,6 +15,7 @@ import { ref, onMounted } from 'vue'
 import MobileLayout from '@/layout/MobileLayout.vue'
 import { getCustomerList } from '@/api/customers'
 import { useRouter } from 'vue-router'
+import { Plus } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const list = ref([])
@@ -23,6 +27,10 @@ const load = async () => {
 
 const view = (item) => {
   router.push(`/m/customers/detail/${item.id}`)
+}
+
+const add = () => {
+  router.push('/m/customers/create')
 }
 
 onMounted(load)
