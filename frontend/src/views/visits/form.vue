@@ -375,6 +375,54 @@ const loadData = async () => {
   }
 }
 
+// 清理表单数据，去除空字段并转换数据类型
+const sanitizeForm = () => {
+  const sanitized = {}
+  sanitized.customerId = form.customerId ? Number(form.customerId) : undefined
+  sanitized.visitDate = form.visitDate || undefined
+  sanitized.visitTime = form.visitTime || undefined
+  sanitized.durationMinutes = form.durationMinutes || undefined
+  sanitized.visitType = form.visitType
+  sanitized.status = form.status
+  sanitized.intentLevel = form.intentLevel
+
+  const stringFields = [
+    'businessItems',
+    'painPoints',
+    'competitors',
+    'budgetRange',
+    'decisionTimeline',
+    'nextStep',
+    'notes',
+    'location',
+    'weather'
+  ]
+  stringFields.forEach((key) => {
+    const value = form[key]
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (trimmed) sanitized[key] = trimmed
+    }
+  })
+
+  if (form.followUpDate) sanitized.followUpDate = form.followUpDate
+
+  // 表单中 materialsLeft 可能为字符串，转换为布尔值
+  if (form.materialsLeft !== '' && form.materialsLeft !== null && form.materialsLeft !== undefined) {
+    sanitized.materialsLeft = typeof form.materialsLeft === 'boolean'
+      ? form.materialsLeft
+      : String(form.materialsLeft).toLowerCase() === 'true'
+  }
+
+  sanitized.wechatAdded = !!form.wechatAdded
+
+  if (form.rating && Number(form.rating) > 0) {
+    sanitized.rating = Number(form.rating)
+  }
+
+  return sanitized
+}
+
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
@@ -384,11 +432,13 @@ const handleSubmit = async () => {
 
     submitting.value = true
     try {
+      const sanitizedForm = sanitizeForm()
+      console.log('提交数据:', JSON.stringify(sanitizedForm, null, 2))
       if (isEdit.value) {
-        await updateVisit(route.params.id, form)
+        await updateVisit(route.params.id, sanitizedForm)
         ElMessage.success('更新成功')
       } else {
-        await createVisit(form)
+        await createVisit(sanitizedForm)
         ElMessage.success('创建成功')
       }
       router.push('/visits')
