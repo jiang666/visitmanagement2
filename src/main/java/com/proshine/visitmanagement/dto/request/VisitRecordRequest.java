@@ -27,15 +27,15 @@ public class VisitRecordRequest {
     @Max(value = 1440, message = "拜访时长不能超过1440分钟")
     private Integer durationMinutes;
     
-    @Pattern(regexp = "FIRST_VISIT|FOLLOW_UP|TECHNICAL|BUSINESS|AFTER_SALES", 
+    @Pattern(regexp = "FIRST_VISIT|FOLLOW_UP|TECHNICAL|BUSINESS|AFTER_SALES|FACE_TO_FACE|PHONE_CALL|VIDEO_CALL|EMAIL|WECHAT|OTHER",
              message = "拜访类型无效")
     private String visitType = "FIRST_VISIT";
     
-    @Pattern(regexp = "SCHEDULED|COMPLETED|CANCELLED|POSTPONED", 
+    @Pattern(regexp = "SCHEDULED|COMPLETED|CANCELLED|POSTPONED|IN_PROGRESS|NO_SHOW",
              message = "拜访状态无效")
     private String status = "SCHEDULED";
     
-    @Pattern(regexp = "A|B|C|D", message = "意向等级无效")
+    @Pattern(regexp = "A|B|C|D|VERY_HIGH|HIGH|MEDIUM|LOW|VERY_LOW|NO_INTENT", message = "意向等级无效")
     private String intentLevel = "C";
     
     @Size(max = 1000, message = "可办事项长度不能超过1000个字符")
