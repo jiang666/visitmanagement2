@@ -38,7 +38,7 @@ const submit = async () => {
       await userStore.userLogin(form)
       // 根据当前路径决定跳转到移动端还是 PC 仪表盘
       if (route.path.startsWith('/m')) {
-        router.push('/m/dashboard')
+        router.push('/m/home')
       } else {
         router.push('/dashboard')
       }

@@ -203,13 +203,22 @@ const routes = [
     meta: { hidden: true }
   },
   {
-    path: '/m/dashboard',
+    path: '/m/home',
     component: () => import('@/views/mobile/DashboardMobile.vue'),
     meta: { hidden: true }
   },
   {
+    path: '/m/dashboard',
+    redirect: '/m/home'
+  },
+  {
     path: '/m/visits/list',
     component: () => import('@/views/mobile/VisitListMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/analysis',
+    component: () => import('@/views/mobile/DataAnalysisMobile.vue'),
     meta: { hidden: true }
   },
   {

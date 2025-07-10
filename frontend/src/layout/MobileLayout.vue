@@ -11,7 +11,7 @@
       <slot />
     </main>
     <nav class="mobile-tab-bar">
-      <div class="tab-item" :class="{ active: isActive('/m/dashboard') }" @click="router.push('/m/dashboard')">
+      <div class="tab-item" :class="{ active: isActive('/m/home') }" @click="router.push('/m/home')">
         <el-icon><Odometer /></el-icon>
         <span>首页</span>
       </div>
@@ -86,9 +86,11 @@ const isActive = (path) => {
   text-align: center;
   padding: 8px 0;
   color: #666;
+  transition: color 0.3s, transform 0.3s;
 }
 
 .tab-item.active {
   color: #409EFF;
+  transform: scale(1.05);
 }
 </style>
