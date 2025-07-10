@@ -142,7 +142,7 @@
 
         <el-table-column prop="departmentCount" label="院系数量" width="100" />
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
             <el-button size="small" @click="handleEditSchool(row)">编辑</el-button>
             <el-button size="small" type="success" @click="handleCreateDepartment(row)">新增院系</el-button>
