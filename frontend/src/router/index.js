@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import Layout from '@/layout/index.vue'
 
+
 const routes = [
   {
     path: '/login',
@@ -167,8 +168,8 @@ const routes = [
   {
     path: '/system',
     component: Layout,
-    meta: { 
-      title: '系统管理', 
+    meta: {
+      title: '系统管理',
       icon: 'Setting', 
       requiresAuth: true, 
       roles: ['ADMIN', 'MANAGER'] 
@@ -194,6 +195,67 @@ const routes = [
         }
       }
     ]
+  },
+  // 移动端路由
+  {
+    path: '/m/login',
+    component: () => import('@/views/mobile/LoginMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/dashboard',
+    component: () => import('@/views/mobile/DashboardMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/visits/list',
+    component: () => import('@/views/mobile/VisitListMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/visits/create',
+    component: () => import('@/views/mobile/VisitFormMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/visits/edit/:id',
+    component: () => import('@/views/mobile/VisitFormMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/visits/detail/:id',
+    component: () => import('@/views/mobile/VisitDetailMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/customers/list',
+    component: () => import('@/views/mobile/CustomerListMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/customers/create',
+    component: () => import('@/views/mobile/CustomerFormMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/customers/edit/:id',
+    component: () => import('@/views/mobile/CustomerFormMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/customers/detail/:id',
+    component: () => import('@/views/mobile/CustomerDetailMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/system/users',
+    component: () => import('@/views/mobile/UserListMobile.vue'),
+    meta: { hidden: true }
+  },
+  {
+    path: '/m/system/schools',
+    component: () => import('@/views/mobile/SchoolListMobile.vue'),
+    meta: { hidden: true }
   },
 //   {
 //     path: '/profile',
