@@ -140,9 +140,9 @@ public class VisitRecordService {
         visitRecord.setVisitDate(request.getVisitDate());
         visitRecord.setVisitTime(request.getVisitTime());
         visitRecord.setDurationMinutes(request.getDurationMinutes());
-        visitRecord.setVisitType(VisitRecord.VisitType.valueOf(request.getVisitType()));
+        visitRecord.setVisitType(convertVisitType(request.getVisitType()));
         visitRecord.setStatus(VisitRecord.VisitStatus.valueOf(request.getStatus()));
-        visitRecord.setIntentLevel(VisitRecord.IntentLevel.valueOf(request.getIntentLevel()));
+        visitRecord.setIntentLevel(convertIntentLevel(request.getIntentLevel()));
 
         // 设置拜访详细内容 - 使用VisitRecord实体中实际存在的字段
         visitRecord.setBusinessItems(request.getBusinessItems());
@@ -191,9 +191,9 @@ public class VisitRecordService {
         visitRecord.setVisitDate(request.getVisitDate());
         visitRecord.setVisitTime(request.getVisitTime());
         visitRecord.setDurationMinutes(request.getDurationMinutes());
-        visitRecord.setVisitType(VisitRecord.VisitType.valueOf(request.getVisitType()));
+        visitRecord.setVisitType(convertVisitType(request.getVisitType()));
         visitRecord.setStatus(VisitRecord.VisitStatus.valueOf(request.getStatus()));
-        visitRecord.setIntentLevel(VisitRecord.IntentLevel.valueOf(request.getIntentLevel()));
+        visitRecord.setIntentLevel(convertIntentLevel(request.getIntentLevel()));
 
         // 更新拜访详细内容 - 使用VisitRecord实体中实际存在的字段
         visitRecord.setBusinessItems(request.getBusinessItems());
@@ -594,6 +594,50 @@ public class VisitRecordService {
                 .createdAt(visitRecord.getCreatedAt())
                 .updatedAt(visitRecord.getUpdatedAt())
                 .build();
+    }
+
+    /**
+     * 将前端传入的拜访类型转换为实体枚举
+     */
+    private VisitRecord.VisitType convertVisitType(String type) {
+        if (type == null) {
+            return VisitRecord.VisitType.FACE_TO_FACE;
+        }
+        switch (type) {
+            case "FIRST_VISIT":
+                return VisitRecord.VisitType.FACE_TO_FACE;
+            case "FOLLOW_UP":
+                return VisitRecord.VisitType.PHONE_CALL;
+            case "TECHNICAL":
+                return VisitRecord.VisitType.VIDEO_CALL;
+            case "BUSINESS":
+                return VisitRecord.VisitType.EMAIL;
+            case "AFTER_SALES":
+                return VisitRecord.VisitType.WECHAT;
+            default:
+                return VisitRecord.VisitType.OTHER;
+        }
+    }
+
+    /**
+     * 将前端传入的意向等级转换为实体枚举
+     */
+    private VisitRecord.IntentLevel convertIntentLevel(String level) {
+        if (level == null) {
+            return VisitRecord.IntentLevel.MEDIUM;
+        }
+        switch (level) {
+            case "A":
+                return VisitRecord.IntentLevel.VERY_HIGH;
+            case "B":
+                return VisitRecord.IntentLevel.HIGH;
+            case "C":
+                return VisitRecord.IntentLevel.MEDIUM;
+            case "D":
+                return VisitRecord.IntentLevel.LOW;
+            default:
+                return VisitRecord.IntentLevel.NO_INTENT;
+        }
     }
 
     /**
