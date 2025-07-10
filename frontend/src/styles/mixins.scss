@@ -1,49 +1,81 @@
 // Sass混合器
 @mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin card-style {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    margin: 0 -10px;
+    border-radius: 0;
+  }
+}
+
+@mixin button-style($color) {
+  background-color: $color;
+  border-color: $color;
+  color: white;
+
+  &:hover {
+    background-color: lighten($color, 10%);
+    border-color: lighten($color, 10%);
+  }
+}
+
+// 响应式断点
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 769px) and (max-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+// 移动端表单布局
+@mixin mobile-form {
+  @include mobile {
+    .el-form-item {
+      .el-form-item__label {
+        text-align: left;
+        padding: 0 0 8px 0;
+      }
+    }
+  }
+}
+
+// 移动端按钮组
+@mixin mobile-button-group {
+  @include mobile {
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  @mixin flex-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  @mixin card-style {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-  }
-  
-  @mixin button-style($color) {
-    background-color: $color;
-    border-color: $color;
-    color: white;
-    
-    &:hover {
-      background-color: lighten($color, 10%);
-      border-color: lighten($color, 10%);
+    flex-direction: column;
+    gap: 10px;
+
+    .el-button {
+      width: 100%;
+      margin: 0;
     }
   }
-  
-  // 响应式断点
-  @mixin mobile {
-    @media (max-width: 768px) {
-      @content;
-    }
-  }
-  
-  @mixin tablet {
-    @media (min-width: 769px) and (max-width: 1024px) {
-      @content;
-    }
-  }
-  
-  @mixin desktop {
-    @media (min-width: 1025px) {
-      @content;
-    }
-  }  
+}
