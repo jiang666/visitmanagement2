@@ -605,15 +605,22 @@ public class VisitRecordService {
         }
         switch (type) {
             case "FIRST_VISIT":
+            case "FACE_TO_FACE":
                 return VisitRecord.VisitType.FACE_TO_FACE;
             case "FOLLOW_UP":
+            case "PHONE_CALL":
                 return VisitRecord.VisitType.PHONE_CALL;
             case "TECHNICAL":
+            case "VIDEO_CALL":
                 return VisitRecord.VisitType.VIDEO_CALL;
             case "BUSINESS":
+            case "EMAIL":
                 return VisitRecord.VisitType.EMAIL;
             case "AFTER_SALES":
+            case "WECHAT":
                 return VisitRecord.VisitType.WECHAT;
+            case "OTHER":
+                return VisitRecord.VisitType.OTHER;
             default:
                 return VisitRecord.VisitType.OTHER;
         }
@@ -628,13 +635,21 @@ public class VisitRecordService {
         }
         switch (level) {
             case "A":
+            case "VERY_HIGH":
                 return VisitRecord.IntentLevel.VERY_HIGH;
             case "B":
+            case "HIGH":
                 return VisitRecord.IntentLevel.HIGH;
             case "C":
+            case "MEDIUM":
                 return VisitRecord.IntentLevel.MEDIUM;
             case "D":
+            case "LOW":
                 return VisitRecord.IntentLevel.LOW;
+            case "VERY_LOW":
+                return VisitRecord.IntentLevel.VERY_LOW;
+            case "NO_INTENT":
+                return VisitRecord.IntentLevel.NO_INTENT;
             default:
                 return VisitRecord.IntentLevel.NO_INTENT;
         }
