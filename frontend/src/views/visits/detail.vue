@@ -71,7 +71,7 @@
                 <span class="label">意向等级：</span>
                 <span class="value">
                   <el-tag :type="getIntentLevelType(data.intentLevel)" size="small">
-                    {{ data.intentLevel }}类
+                    {{ getIntentLevelText(data.intentLevel) }}
                   </el-tag>
                 </span>
               </div>
@@ -152,7 +152,7 @@
                   </el-descriptions-item>
                   <el-descriptions-item label="意向等级">
                     <el-tag :type="getIntentLevelType(data.intentLevel)">
-                      {{ data.intentLevel }}类
+                      {{ getIntentLevelText(data.intentLevel) }}
                     </el-tag>
                   </el-descriptions-item>
                 </el-descriptions>
@@ -209,6 +209,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { getVisitDetail } from '@/api/visits'
 
 const route = useRoute()
 const router = useRouter()
@@ -226,41 +227,62 @@ const checkScreenSize = () => {
 // 工具方法
 const getStatusType = (status) => {
   const typeMap = {
-    'PLANNED': 'info',
+    'SCHEDULED': 'info',
     'IN_PROGRESS': 'warning',
     'COMPLETED': 'success',
-    'CANCELLED': 'danger'
+    'CANCELLED': 'danger',
+    'POSTPONED': 'warning',
+    'NO_SHOW': 'danger'
   }
   return typeMap[status] || 'info'
 }
 
 const getStatusText = (status) => {
   const textMap = {
-    'PLANNED': '计划中',
+    'SCHEDULED': '已安排',
     'IN_PROGRESS': '进行中',
     'COMPLETED': '已完成',
-    'CANCELLED': '已取消'
+    'CANCELLED': '已取消',
+    'POSTPONED': '已延期',
+    'NO_SHOW': '未出现'
   }
   return textMap[status] || status
 }
 
 const getVisitTypeText = (type) => {
   const textMap = {
-    'PHONE': '电话拜访',
-    'VISIT': '上门拜访',
-    'MEETING': '会议交流'
+    'FACE_TO_FACE': '面对面拜访',
+    'PHONE_CALL': '电话拜访',
+    'VIDEO_CALL': '视频拜访',
+    'EMAIL': '邮件沟通',
+    'WECHAT': '微信沟通',
+    'OTHER': '其他'
   }
   return textMap[type] || type
 }
 
 const getIntentLevelType = (level) => {
   const typeMap = {
-    'A': 'danger',
-    'B': 'warning',
-    'C': 'success',
-    'D': 'info'
+    'VERY_HIGH': 'danger',
+    'HIGH': 'warning',
+    'MEDIUM': 'success',
+    'LOW': 'info',
+    'VERY_LOW': 'info',
+    'NO_INTENT': 'info'
   }
   return typeMap[level] || 'info'
+}
+
+const getIntentLevelText = (level) => {
+  const textMap = {
+    'VERY_HIGH': '非常高',
+    'HIGH': '高',
+    'MEDIUM': '中等',
+    'LOW': '低',
+    'VERY_LOW': '非常低',
+    'NO_INTENT': '无意向'
+  }
+  return textMap[level] || level
 }
 
 // 事件处理
@@ -276,28 +298,15 @@ const handleEdit = () => {
 const loadData = async () => {
   loading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟数据
+    const response = await getVisitDetail(route.params.id)
+    const visit = response.data
     data.value = {
-      id: route.params.id,
-      customerName: '张三',
-      customerPosition: '教授',
-      schoolName: '北京大学',
-      departmentName: '计算机学院',
-      salesName: '李销售',
-      visitDate: '2024-01-15',
-      visitTime: '14:30',
-      visitDuration: 120,
-      visitType: 'VISIT',
-      status: 'COMPLETED',
-      intentLevel: 'A',
-      purpose: '介绍我司最新的教学管理系统解决方案，了解学校的信息化建设需求。',
-      content: '详细介绍了我司的教学管理系统功能特点，包括学生管理、课程管理、成绩管理等核心模块。客户对系统的用户界面和操作便捷性表示认可。',
-      feedback: '客户对我们的产品很感兴趣，特别是移动端功能。提出希望能够支持多校区管理和数据统计分析功能。',
-      nextPlan: '下周三安排技术人员进行现场演示，重点展示多校区管理和数据分析功能。',
-      notes: '客户预算充足，决策权在手，是重点跟进客户。'
+      ...visit,
+      visitDuration: visit.durationMinutes,
+      purpose: visit.businessItems,
+      content: visit.painPoints,
+      feedback: visit.competitors,
+      nextPlan: visit.nextStep
     }
   } catch (error) {
     ElMessage.error('加载数据失败')
