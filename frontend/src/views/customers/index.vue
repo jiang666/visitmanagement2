@@ -165,16 +165,17 @@
   
   <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
-  import { useRouter } from 'vue-router'
-  import {
-    Search, Refresh, Plus, Delete, Upload, Download
-  } from '@element-plus/icons-vue'
-  import {
-    getCustomerList,
-    deleteCustomer,
-    batchDeleteCustomers,
-    exportCustomers
-  } from '@/api/customers'
+import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Search, Refresh, Plus, Delete, Upload, Download
+} from '@element-plus/icons-vue'
+import {
+  getCustomerList,
+  deleteCustomer,
+  batchDeleteCustomers,
+  exportCustomers
+} from '@/api/customers'
   
 const router = useRouter()
 

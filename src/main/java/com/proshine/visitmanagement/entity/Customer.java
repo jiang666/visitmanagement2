@@ -72,6 +72,14 @@ public class Customer {
     private String title;
 
     /**
+     * 所属学校
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_id")
+    @JsonIgnore
+    private School school;
+
+    /**
      * 所属院系
      */
     @ManyToOne(fetch = FetchType.LAZY)

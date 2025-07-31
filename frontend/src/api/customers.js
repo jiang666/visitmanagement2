@@ -40,8 +40,8 @@ export function deleteCustomer(id) {
 
 export function batchDeleteCustomers(ids) {
   return request({
-    url: '/customers/batch-delete',
-    method: 'post',
+    url: '/customers/batch',
+    method: 'delete',
     data: ids
   })
 }

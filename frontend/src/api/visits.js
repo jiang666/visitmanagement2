@@ -59,9 +59,9 @@ export function deleteVisit(id) {
  */
 export function batchDeleteVisits(ids) {
   return request({
-    url: '/visit-records/batch-delete',
-    method: 'post',
-    data: { ids }
+    url: '/visit-records/batch',
+    method: 'delete',
+    data: ids
   })
 }
 /**

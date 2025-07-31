@@ -25,6 +25,8 @@ public class CustomerRequest {
     @Size(max = 50, message = "职称长度不能超过50个字符")
     private String title;
 
+    private Long schoolId;
+
     private Long departmentId;
 
     @Size(max = 20, message = "电话长度不能超过20个字符")

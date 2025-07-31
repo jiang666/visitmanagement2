@@ -62,10 +62,12 @@
                   clearable
                   style="width: 100%"
               >
-                <el-option label="A类" value="A" />
-                <el-option label="B类" value="B" />
-                <el-option label="C类" value="C" />
-                <el-option label="D类" value="D" />
+                <el-option label="非常高" value="VERY_HIGH" />
+                <el-option label="高" value="HIGH" />
+                <el-option label="中等" value="MEDIUM" />
+                <el-option label="低" value="LOW" />
+                <el-option label="非常低" value="VERY_LOW" />
+                <el-option label="无意向" value="NO_INTENT" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -138,7 +140,7 @@
             <div class="info-row">
               <span class="label">意向等级：</span>
               <el-tag :type="getIntentLevelType(item.intentLevel)" size="small">
-                {{ item.intentLevel }}类
+                {{ getIntentLevelText(item.intentLevel) }}
               </el-tag>
             </div>
             <div class="info-row">
@@ -193,7 +195,7 @@
         <el-table-column prop="intentLevel" label="意向等级" width="100">
           <template #default="{ row }">
             <el-tag :type="getIntentLevelType(row.intentLevel)">
-              {{ row.intentLevel }}类
+              {{ getIntentLevelText(row.intentLevel) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -229,6 +231,7 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, Delete, Download } from '@element-plus/icons-vue'
+import { getVisitList, deleteVisit, batchDeleteVisits, exportVisits } from '@/api/visits'
 
 const router = useRouter()
 
@@ -260,56 +263,82 @@ const pagination = reactive({
 
 // 选项数据
 const visitTypeOptions = [
-  { label: '电话拜访', value: 'PHONE' },
-  { label: '上门拜访', value: 'VISIT' },
-  { label: '会议交流', value: 'MEETING' }
+  { label: '面对面拜访', value: 'FACE_TO_FACE' },
+  { label: '电话拜访', value: 'PHONE_CALL' },
+  { label: '视频拜访', value: 'VIDEO_CALL' },
+  { label: '邮件沟通', value: 'EMAIL' },
+  { label: '微信沟通', value: 'WECHAT' },
+  { label: '其他', value: 'OTHER' }
 ]
 
 const statusOptions = [
-  { label: '计划中', value: 'PLANNED' },
+  { label: '已安排', value: 'SCHEDULED' },
   { label: '进行中', value: 'IN_PROGRESS' },
   { label: '已完成', value: 'COMPLETED' },
-  { label: '已取消', value: 'CANCELLED' }
+  { label: '已取消', value: 'CANCELLED' },
+  { label: '已延期', value: 'POSTPONED' },
+  { label: '未出现', value: 'NO_SHOW' }
 ]
 
 // 工具方法
 const getStatusType = (status) => {
   const typeMap = {
-    'PLANNED': 'info',
+    'SCHEDULED': 'info',
     'IN_PROGRESS': 'warning',
     'COMPLETED': 'success',
-    'CANCELLED': 'danger'
+    'CANCELLED': 'danger',
+    'POSTPONED': 'warning',
+    'NO_SHOW': 'danger'
   }
   return typeMap[status] || 'info'
 }
 
 const getStatusText = (status) => {
   const textMap = {
-    'PLANNED': '计划中',
+    'SCHEDULED': '已安排',
     'IN_PROGRESS': '进行中',
     'COMPLETED': '已完成',
-    'CANCELLED': '已取消'
+    'CANCELLED': '已取消',
+    'POSTPONED': '已延期',
+    'NO_SHOW': '未出现'
   }
   return textMap[status] || status
 }
 
 const getVisitTypeText = (type) => {
   const textMap = {
-    'PHONE': '电话拜访',
-    'VISIT': '上门拜访',
-    'MEETING': '会议交流'
+    'FACE_TO_FACE': '面对面拜访',
+    'PHONE_CALL': '电话拜访',
+    'VIDEO_CALL': '视频拜访',
+    'EMAIL': '邮件沟通',
+    'WECHAT': '微信沟通',
+    'OTHER': '其他'
   }
   return textMap[type] || type
 }
 
 const getIntentLevelType = (level) => {
   const typeMap = {
-    'A': 'danger',
-    'B': 'warning',
-    'C': 'success',
-    'D': 'info'
+    'VERY_HIGH': 'danger',
+    'HIGH': 'warning', 
+    'MEDIUM': 'success',
+    'LOW': 'info',
+    'VERY_LOW': 'info',
+    'NO_INTENT': 'info'
   }
   return typeMap[level] || 'info'
+}
+
+const getIntentLevelText = (level) => {
+  const textMap = {
+    'VERY_HIGH': '非常高',
+    'HIGH': '高',
+    'MEDIUM': '中等',
+    'LOW': '低',
+    'VERY_LOW': '非常低',
+    'NO_INTENT': '无意向'
+  }
+  return textMap[level] || level
 }
 
 // 事件处理
@@ -340,30 +369,66 @@ const handleEdit = (row) => {
   router.push(`/visits/edit/${row.id}`)
 }
 
-const handleDelete = (row) => {
-  ElMessageBox.confirm('确定要删除这条拜访记录吗？', '警告', {
-    type: 'warning'
-  }).then(() => {
-    // 调用删除API
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条拜访记录吗？', '警告', {
+      type: 'warning'
+    })
+    
+    await deleteVisit(row.id)
     ElMessage.success('删除成功')
     loadData()
-  })
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
+  }
 }
 
-const handleBatchDelete = () => {
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 条记录吗？`, '警告', {
-    type: 'warning'
-  }).then(() => {
-    // 调用批量删除API
+const handleBatchDelete = async () => {
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 条记录吗？`, '警告', {
+      type: 'warning'
+    })
+    
+    const ids = selectedRows.value.map(row => row.id)
+    await batchDeleteVisits(ids)
     ElMessage.success('批量删除成功')
     selectedRows.value = []
     loadData()
-  })
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('批量删除失败')
+    }
+  }
 }
 
-const handleExport = () => {
-  // 导出逻辑
-  ElMessage.success('导出成功')
+const handleExport = async () => {
+  try {
+    const params = {
+      keyword: searchForm.keyword,
+      visitType: searchForm.visitType,
+      status: searchForm.status,
+      intentLevel: searchForm.intentLevel
+    }
+    
+    const response = await exportVisits(params)
+    
+    // 创建下载链接
+    const blob = new Blob([response], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `拜访记录_${new Date().getTime()}.xlsx`
+    link.click()
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error) {
+    ElMessage.error('导出失败')
+  }
 }
 
 const handleSelectionChange = (selection) => {
@@ -384,28 +449,22 @@ const handleCurrentChange = (page) => {
 const loadData = async () => {
   loading.value = true
   try {
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟数据
-    tableData.value = [
-      {
-        id: 1,
-        customerName: '张三',
-        customerPosition: '教授',
-        schoolName: '北京大学',
-        departmentName: '计算机学院',
-        visitDate: '2024-01-15',
-        visitType: 'VISIT',
-        status: 'COMPLETED',
-        intentLevel: 'A',
-        salesName: '李销售'
-      },
-      // 更多模拟数据...
-    ]
-
-    pagination.total = 100
+    const params = {
+      page: pagination.page - 1,
+      size: pagination.size,
+      keyword: searchForm.keyword,
+      visitType: searchForm.visitType,
+      status: searchForm.status,
+      intentLevel: searchForm.intentLevel
+    }
+    
+    const response = await getVisitList(params)
+    const { content, totalElements } = response.data
+    
+    tableData.value = content
+    pagination.total = totalElements
   } catch (error) {
+    console.error('加载数据失败:', error)
     ElMessage.error('加载数据失败')
   } finally {
     loading.value = false

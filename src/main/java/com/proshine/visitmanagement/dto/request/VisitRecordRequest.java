@@ -13,8 +13,18 @@ import java.time.LocalTime;
 @Data
 public class VisitRecordRequest {
     
-    @NotNull(message = "客户ID不能为空")
     private Long customerId;
+    
+    // 新增客户信息字段 - 当customerId为空时使用
+    private String customerName;
+    private String customerPosition;
+    private String customerPhone;
+    private String customerEmail;
+    private Long schoolId;
+    private String departmentName;
+    
+    // 销售人员ID - 可选，如果为空则使用当前登录用户
+    private Long salesId;
     
     @NotNull(message = "拜访日期不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -27,16 +37,16 @@ public class VisitRecordRequest {
     @Max(value = 1440, message = "拜访时长不能超过1440分钟")
     private Integer durationMinutes;
     
-    @Pattern(regexp = "FIRST_VISIT|FOLLOW_UP|TECHNICAL|BUSINESS|AFTER_SALES|FACE_TO_FACE|PHONE_CALL|VIDEO_CALL|EMAIL|WECHAT|OTHER",
+    @Pattern(regexp = "FACE_TO_FACE|PHONE_CALL|VIDEO_CALL|EMAIL|WECHAT|OTHER",
              message = "拜访类型无效")
-    private String visitType = "FIRST_VISIT";
+    private String visitType = "FACE_TO_FACE";
     
     @Pattern(regexp = "SCHEDULED|COMPLETED|CANCELLED|POSTPONED|IN_PROGRESS|NO_SHOW",
              message = "拜访状态无效")
     private String status = "SCHEDULED";
     
-    @Pattern(regexp = "A|B|C|D|VERY_HIGH|HIGH|MEDIUM|LOW|VERY_LOW|NO_INTENT", message = "意向等级无效")
-    private String intentLevel = "C";
+    @Pattern(regexp = "VERY_HIGH|HIGH|MEDIUM|LOW|VERY_LOW|NO_INTENT", message = "意向等级无效")
+    private String intentLevel = "MEDIUM";
     
     @Size(max = 1000, message = "可办事项长度不能超过1000个字符")
     private String businessItems;

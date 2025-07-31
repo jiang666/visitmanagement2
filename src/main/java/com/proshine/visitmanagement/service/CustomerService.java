@@ -5,12 +5,14 @@ import com.proshine.visitmanagement.dto.response.CustomerResponse;
 import com.proshine.visitmanagement.dto.response.PageResponse;
 import com.proshine.visitmanagement.entity.Customer;
 import com.proshine.visitmanagement.entity.Department;
+import com.proshine.visitmanagement.entity.School;
 import com.proshine.visitmanagement.entity.User;
 import com.proshine.visitmanagement.entity.VisitRecord;
 import com.proshine.visitmanagement.exception.BusinessException;
 import com.proshine.visitmanagement.exception.ResourceNotFoundException;
 import com.proshine.visitmanagement.repository.CustomerRepository;
 import com.proshine.visitmanagement.repository.DepartmentRepository;
+import com.proshine.visitmanagement.repository.SchoolRepository;
 import com.proshine.visitmanagement.repository.UserRepository;
 import com.proshine.visitmanagement.repository.VisitRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final DepartmentRepository departmentRepository;
+    private final SchoolRepository schoolRepository;
     private final UserRepository userRepository;
     private final VisitRecordRepository visitRecordRepository;
 
@@ -123,11 +126,23 @@ public class CustomerService {
         // 获取当前用户
         User currentUser = getCurrentUser(authentication);
 
+        // 验证学校是否存在
+        School school = null;
+        if (request.getSchoolId() != null) {
+            school = schoolRepository.findById(request.getSchoolId())
+                    .orElseThrow(() -> new ResourceNotFoundException("学校不存在"));
+        }
+        
         // 验证院系是否存在
         Department department = null;
         if (request.getDepartmentId() != null) {
             department = departmentRepository.findById(request.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("院系不存在"));
+            
+            // 如果选择了院系，验证院系是否属于选择的学校
+            if (school != null && !department.getSchool().getId().equals(school.getId())) {
+                throw new BusinessException("所选院系不属于所选学校");
+            }
         }
 
         // 检查邮箱是否已存在
@@ -140,6 +155,7 @@ public class CustomerService {
         customer.setName(request.getName());
         customer.setPosition(request.getPosition());
         customer.setTitle(request.getTitle());
+        customer.setSchool(school);
         customer.setDepartment(department);
         customer.setPhone(request.getPhone());
         customer.setWechat(request.getWechat());
@@ -180,11 +196,23 @@ public class CustomerService {
         // 获取当前用户
         User currentUser = getCurrentUser(authentication);
 
+        // 验证学校是否存在
+        School school = null;
+        if (request.getSchoolId() != null) {
+            school = schoolRepository.findById(request.getSchoolId())
+                    .orElseThrow(() -> new ResourceNotFoundException("学校不存在"));
+        }
+        
         // 验证院系是否存在
         Department department = null;
         if (request.getDepartmentId() != null) {
             department = departmentRepository.findById(request.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("院系不存在"));
+            
+            // 如果选择了院系，验证院系是否属于选择的学校
+            if (school != null && !department.getSchool().getId().equals(school.getId())) {
+                throw new BusinessException("所选院系不属于所选学校");
+            }
         }
 
         // 检查邮箱是否已被其他客户使用
@@ -200,6 +228,7 @@ public class CustomerService {
         customer.setName(request.getName());
         customer.setPosition(request.getPosition());
         customer.setTitle(request.getTitle());
+        customer.setSchool(school);
         customer.setDepartment(department);
         customer.setPhone(request.getPhone());
         customer.setWechat(request.getWechat());
@@ -671,6 +700,12 @@ public class CustomerService {
      */
     private CustomerResponse convertToResponse(Customer customer) {
         Department department = customer.getDepartment();
+        School school = customer.getSchool();
+        
+        // 如果没有直接关联学校，尝试从院系获取学校信息
+        if (school == null && department != null) {
+            school = department.getSchool();
+        }
 
         // 统计拜访相关信息
         long visitCount = visitRecordRepository.countByCustomerId(customer.getId());
@@ -684,11 +719,11 @@ public class CustomerService {
                 .title(customer.getTitle())
                 .departmentId(department != null ? department.getId() : null)
                 .departmentName(department != null ? department.getName() : null)
-                .schoolId(department != null && department.getSchool() != null ? department.getSchool().getId() : null)
-                .schoolName(department != null && department.getSchool() != null ? department.getSchool().getName() : null)
-                .schoolCity(department != null && department.getSchool() != null ? department.getSchool().getCity() : null)
-                .schoolType(department != null && department.getSchool() != null ? department.getSchool().getSchoolType().name() : null)
-                .schoolTypeDescription(department != null && department.getSchool() != null ? department.getSchool().getSchoolType().getDescription() : null)
+                .schoolId(school != null ? school.getId() : null)
+                .schoolName(school != null ? school.getName() : null)
+                .schoolCity(school != null ? school.getCity() : null)
+                .schoolType(school != null ? school.getSchoolType().name() : null)
+                .schoolTypeDescription(school != null ? school.getSchoolType().getDescription() : null)
                 .phone(customer.getPhone())
                 .wechat(customer.getWechat())
                 .email(customer.getEmail())

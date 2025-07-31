@@ -1,6 +1,8 @@
 package com.proshine.visitmanagement.service;
 
+import com.proshine.visitmanagement.dto.request.CustomerRequest;
 import com.proshine.visitmanagement.dto.request.VisitRecordRequest;
+import com.proshine.visitmanagement.dto.response.CustomerResponse;
 import com.proshine.visitmanagement.dto.response.PageResponse;
 import com.proshine.visitmanagement.dto.response.VisitRecordResponse;
 import com.proshine.visitmanagement.entity.Customer;
@@ -47,6 +49,7 @@ public class VisitRecordService {
     private final VisitRecordRepository visitRecordRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final CustomerService customerService;
 
     /**
      * 分页查询拜访记录
@@ -127,16 +130,48 @@ public class VisitRecordService {
      */
     @Transactional
     public VisitRecordResponse createVisitRecord(VisitRecordRequest request, Authentication authentication) {
-        // 验证客户是否存在
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new ResourceNotFoundException("客户不存在"));
+        Customer customer;
+        
+        // 如果customerId为空，则创建新客户
+        if (request.getCustomerId() == null) {
+            if (request.getCustomerName() == null || request.getCustomerName().trim().isEmpty()) {
+                throw new BusinessException("客户姓名不能为空");
+            }
+            
+            // 创建客户请求对象
+            CustomerRequest customerRequest = new CustomerRequest();
+            customerRequest.setName(request.getCustomerName());
+            customerRequest.setPosition(request.getCustomerPosition());
+            customerRequest.setPhone(request.getCustomerPhone());
+            customerRequest.setEmail(request.getCustomerEmail());
+            customerRequest.setSchoolId(request.getSchoolId());
+            // 注意：CustomerRequest使用departmentId而不是departmentName
+            // 如果需要根据departmentName查找departmentId，需要额外逻辑
+            
+            // 创建新客户
+            CustomerResponse customerResponse = customerService.createCustomer(customerRequest, authentication);
+            customer = customerRepository.findById(customerResponse.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("创建的客户不存在"));
+            
+            log.info("为拜访记录创建新客户: ID={}, 姓名={}", customer.getId(), customer.getName());
+        } else {
+            // 验证客户是否存在
+            customer = customerRepository.findById(request.getCustomerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("客户不存在"));
+        }
 
-        // 获取当前用户作为销售人员
-        User currentUser = getCurrentUser(authentication);
+        // 获取销售人员 - 如果指定了salesId则使用指定的，否则使用当前用户
+        User salesUser;
+        if (request.getSalesId() != null) {
+            salesUser = userRepository.findById(request.getSalesId())
+                    .orElseThrow(() -> new ResourceNotFoundException("指定的销售人员不存在"));
+        } else {
+            salesUser = getCurrentUser(authentication);
+        }
 
         VisitRecord visitRecord = new VisitRecord();
         visitRecord.setCustomer(customer);
-        visitRecord.setSales(currentUser);
+        visitRecord.setSales(salesUser);
         visitRecord.setVisitDate(request.getVisitDate());
         visitRecord.setVisitTime(request.getVisitTime());
         visitRecord.setDurationMinutes(request.getDurationMinutes());
@@ -160,7 +195,7 @@ public class VisitRecordService {
         visitRecord.setWeather(request.getWeather());
 
         VisitRecord savedRecord = visitRecordRepository.save(visitRecord);
-        log.info("创建拜访记录成功: ID={}, 客户ID={}", savedRecord.getId(), request.getCustomerId());
+        log.info("创建拜访记录成功: ID={}, 客户ID={}", savedRecord.getId(), customer.getId());
 
         return convertToResponse(savedRecord);
     }
@@ -182,10 +217,17 @@ public class VisitRecordService {
         checkVisitRecordPermission(visitRecord, authentication);
 
         // 验证客户是否存在
-        if (!visitRecord.getCustomer().getId().equals(request.getCustomerId())) {
+        if (request.getCustomerId() != null && !visitRecord.getCustomer().getId().equals(request.getCustomerId())) {
             Customer customer = customerRepository.findById(request.getCustomerId())
                     .orElseThrow(() -> new ResourceNotFoundException("客户不存在"));
             visitRecord.setCustomer(customer);
+        }
+
+        // 更新销售人员 - 如果指定了salesId则使用指定的
+        if (request.getSalesId() != null && !visitRecord.getSales().getId().equals(request.getSalesId())) {
+            User salesUser = userRepository.findById(request.getSalesId())
+                    .orElseThrow(() -> new ResourceNotFoundException("指定的销售人员不存在"));
+            visitRecord.setSales(salesUser);
         }
 
         visitRecord.setVisitDate(request.getVisitDate());
@@ -524,6 +566,45 @@ public class VisitRecordService {
     }
 
     /**
+     * 获取客户的学校ID（优先从直接关联的学校获取，其次从院系关联的学校获取）
+     */
+    private Long getSchoolId(Customer customer) {
+        if (customer.getSchool() != null) {
+            return customer.getSchool().getId();
+        }
+        if (customer.getDepartment() != null && customer.getDepartment().getSchool() != null) {
+            return customer.getDepartment().getSchool().getId();
+        }
+        return null;
+    }
+
+    /**
+     * 获取客户的学校名称（优先从直接关联的学校获取，其次从院系关联的学校获取）
+     */
+    private String getSchoolName(Customer customer) {
+        if (customer.getSchool() != null) {
+            return customer.getSchool().getName();
+        }
+        if (customer.getDepartment() != null && customer.getDepartment().getSchool() != null) {
+            return customer.getDepartment().getSchool().getName();
+        }
+        return null;
+    }
+
+    /**
+     * 获取客户的学校城市（优先从直接关联的学校获取，其次从院系关联的学校获取）
+     */
+    private String getSchoolCity(Customer customer) {
+        if (customer.getSchool() != null) {
+            return customer.getSchool().getCity();
+        }
+        if (customer.getDepartment() != null && customer.getDepartment().getSchool() != null) {
+            return customer.getDepartment().getSchool().getCity();
+        }
+        return null;
+    }
+
+    /**
      * 转换为响应对象
      */
     private VisitRecordResponse convertToResponse(VisitRecord visitRecord) {
@@ -546,12 +627,9 @@ public class VisitRecordService {
                 // 院系和学校信息
                 .departmentId(customer.getDepartment() != null ? customer.getDepartment().getId() : null)
                 .departmentName(customer.getDepartment() != null ? customer.getDepartment().getName() : null)
-                .schoolId(customer.getDepartment() != null && customer.getDepartment().getSchool() != null ?
-                        customer.getDepartment().getSchool().getId() : null)
-                .schoolName(customer.getDepartment() != null && customer.getDepartment().getSchool() != null ?
-                        customer.getDepartment().getSchool().getName() : null)
-                .schoolCity(customer.getDepartment() != null && customer.getDepartment().getSchool() != null ?
-                        customer.getDepartment().getSchool().getCity() : null)
+                .schoolId(getSchoolId(customer))
+                .schoolName(getSchoolName(customer))
+                .schoolCity(getSchoolCity(customer))
 
                 // 销售人员信息
                 .salesId(sales.getId())
@@ -576,8 +654,8 @@ public class VisitRecordService {
                 .nextSteps(visitRecord.getNextStep()) // nextStep -> nextSteps
                 .visitSummary(visitRecord.getNotes()) // notes -> visitSummary (暂时映射)
                 .notes(visitRecord.getNotes())
-
-                // 新增字段 - 直接映射VisitRecord的原始字段
+                
+                // 直接映射字段供前端使用
                 .businessItems(visitRecord.getBusinessItems())
                 .painPoints(visitRecord.getPainPoints())
                 .competitors(visitRecord.getCompetitors())

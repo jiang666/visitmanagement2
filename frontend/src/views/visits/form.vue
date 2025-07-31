@@ -47,7 +47,7 @@
             </el-col>
 
             <el-col :xs="24" :sm="12" :md="8">
-              <el-form-item label="所在学校" prop="schoolName" :required="true">
+              <el-form-item label="所在学校" prop="schoolId" :required="true">
                 <el-select
                     v-model="form.schoolId"
                     placeholder="请选择学校"
@@ -117,17 +117,20 @@
                     placeholder="请选择拜访类型"
                     style="width: 100%"
                 >
-                  <el-option label="电话拜访" value="PHONE" />
-                  <el-option label="上门拜访" value="VISIT" />
-                  <el-option label="会议交流" value="MEETING" />
+                  <el-option label="面对面拜访" value="FACE_TO_FACE" />
+                  <el-option label="电话拜访" value="PHONE_CALL" />
+                  <el-option label="视频拜访" value="VIDEO_CALL" />
+                  <el-option label="邮件沟通" value="EMAIL" />
+                  <el-option label="微信沟通" value="WECHAT" />
+                  <el-option label="其他" value="OTHER" />
                 </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :xs="24" :sm="12" :md="6">
-              <el-form-item label="拜访时长" prop="visitDuration">
+              <el-form-item label="拜访时长" prop="durationMinutes">
                 <el-input
-                    v-model="form.visitDuration"
+                    v-model="form.durationMinutes"
                     placeholder="请输入拜访时长（分钟）"
                     type="number"
                 />
@@ -141,10 +144,12 @@
                     placeholder="请选择状态"
                     style="width: 100%"
                 >
-                  <el-option label="计划中" value="PLANNED" />
+                  <el-option label="已安排" value="SCHEDULED" />
                   <el-option label="进行中" value="IN_PROGRESS" />
                   <el-option label="已完成" value="COMPLETED" />
                   <el-option label="已取消" value="CANCELLED" />
+                  <el-option label="已延期" value="POSTPONED" />
+                  <el-option label="未出现" value="NO_SHOW" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -156,10 +161,12 @@
                     placeholder="请选择意向等级"
                     style="width: 100%"
                 >
-                  <el-option label="A类" value="A" />
-                  <el-option label="B类" value="B" />
-                  <el-option label="C类" value="C" />
-                  <el-option label="D类" value="D" />
+                  <el-option label="非常高" value="VERY_HIGH" />
+                  <el-option label="高" value="HIGH" />
+                  <el-option label="中等" value="MEDIUM" />
+                  <el-option label="低" value="LOW" />
+                  <el-option label="非常低" value="VERY_LOW" />
+                  <el-option label="无意向" value="NO_INTENT" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -270,6 +277,9 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { getSchoolList } from '@/api/schools'
+import { getVisitDetail, createVisit, updateVisit } from '@/api/visits'
+import { getUserList } from '@/api/users'
 
 const route = useRoute()
 const router = useRouter()
@@ -290,6 +300,7 @@ const isEdit = computed(() => !!route.params.id)
 
 // 表单数据
 const form = reactive({
+  customerId: null,
   customerName: '',
   customerPosition: '',
   customerPhone: '',
@@ -300,8 +311,8 @@ const form = reactive({
   visitDate: '',
   visitTime: '',
   visitType: '',
-  visitDuration: '',
-  status: 'PLANNED',
+  durationMinutes: '',
+  status: 'SCHEDULED',
   intentLevel: '',
   salesId: null,
   purpose: '',
@@ -350,6 +361,39 @@ const handleSchoolChange = (schoolId) => {
   }
 }
 
+// 日期格式化函数
+const formatDate = (date) => {
+  if (!date) return null
+  if (typeof date === 'string') return date
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// 时间格式化函数
+const formatTime = (time) => {
+  if (!time) return null
+  if (typeof time === 'string') return time
+  const t = new Date(time)
+  const hours = String(t.getHours()).padStart(2, '0')
+  const minutes = String(t.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+// 时间字符串解析函数
+const parseTimeString = (timeStr) => {
+  if (!timeStr) return null
+  const [hours, minutes] = timeStr.split(':')
+  const date = new Date()
+  date.setHours(parseInt(hours, 10))
+  date.setMinutes(parseInt(minutes, 10))
+  date.setSeconds(0)
+  date.setMilliseconds(0)
+  return date
+}
+
 const handleSubmit = async () => {
   if (!formRef.value) return
 
@@ -357,14 +401,42 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     submitting.value = true
 
-    // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const visitData = {
+      customerId: form.customerId,
+      customerName: form.customerName,
+      customerPosition: form.customerPosition,
+      customerPhone: form.customerPhone,
+      customerEmail: form.customerEmail,
+      schoolId: form.schoolId,
+      departmentName: form.departmentName,
+      visitDate: form.visitDate ? formatDate(form.visitDate) : null,
+      visitTime: form.visitTime ? formatTime(form.visitTime) : null,
+      visitType: form.visitType,
+      durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes) : null,
+      status: form.status,
+      intentLevel: form.intentLevel,
+      salesId: form.salesId,
+      businessItems: form.purpose,
+      painPoints: form.content,
+      competitors: form.feedback,
+      nextStep: form.nextPlan,
+      notes: form.notes,
+      budgetRange: form.expectedRevenue
+    }
 
-    ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+    if (isEdit.value) {
+      await updateVisit(route.params.id, visitData)
+      ElMessage.success('更新成功')
+    } else {
+      await createVisit(visitData)
+      ElMessage.success('创建成功')
+    }
+    
     router.push('/visits/list')
   } catch (error) {
     if (error !== false) {
-      ElMessage.error('保存失败')
+      console.error('Save visit error:', error)
+      ElMessage.error('保存失败：' + (error.message || '未知错误'))
     }
   } finally {
     submitting.value = false
@@ -376,36 +448,56 @@ const loadData = async () => {
   loading.value = true
   try {
     // 加载学校选项
-    schoolOptions.value = [
-      { id: 1, name: '北京大学' },
-      { id: 2, name: '清华大学' },
-      { id: 3, name: '复旦大学' }
-    ]
+    const schoolResponse = await getSchoolList({ size: 100 })
+    schoolOptions.value = schoolResponse.data?.content || []
 
     // 加载销售人员选项
-    salesOptions.value = [
-      { id: 1, realName: '张销售' },
-      { id: 2, realName: '李销售' },
-      { id: 3, realName: '王销售' }
-    ]
+    const userResponse = await getUserList({ size: 100 })
+    salesOptions.value = userResponse.data?.content || []
 
     // 如果是编辑模式，加载表单数据
     if (isEdit.value) {
-      // 模拟加载编辑数据
-      Object.assign(form, {
-        customerName: '张三',
-        customerPosition: '教授',
-        schoolId: 1,
-        schoolName: '北京大学',
-        visitType: 'VISIT',
-        status: 'COMPLETED',
-        intentLevel: 'A'
-      })
+      await loadVisitDetail()
     }
   } catch (error) {
+    console.error('加载数据失败:', error)
     ElMessage.error('加载数据失败')
   } finally {
     loading.value = false
+  }
+}
+
+const loadVisitDetail = async () => {
+  try {
+    const response = await getVisitDetail(route.params.id)
+    const visit = response.data
+    
+    Object.assign(form, {
+      customerId: visit.customerId,
+      customerName: visit.customerName || '',
+      customerPosition: visit.customerPosition || '',
+      customerPhone: visit.customerPhone || '',
+      customerEmail: visit.customerEmail || '',
+      schoolId: visit.schoolId || null,
+      departmentName: visit.departmentName || '',
+      visitDate: visit.visitDate ? new Date(visit.visitDate) : '',
+      visitTime: visit.visitTime ? parseTimeString(visit.visitTime) : '',
+      visitType: visit.visitType || '',
+      durationMinutes: visit.durationMinutes ? visit.durationMinutes.toString() : '',
+      status: visit.status || 'SCHEDULED',
+      intentLevel: visit.intentLevel || '',
+      salesId: visit.salesId || null,
+      purpose: visit.businessItems || '',
+      content: visit.painPoints || '',
+      feedback: visit.competitors || '',
+      nextPlan: visit.nextStep || '',
+      notes: visit.notes || '',
+      expectedRevenue: visit.budgetRange || ''
+    })
+  } catch (error) {
+    console.error('Failed to load visit detail:', error)
+    ElMessage.error('加载拜访记录详情失败')
+    router.back()
   }
 }
 
