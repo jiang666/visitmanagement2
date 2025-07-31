@@ -64,19 +64,25 @@ export function batchDeleteVisits(ids) {
     data: ids
   })
 }
+
 /**
  * 导出拜访记录
  */
 export function exportVisits(params) {
-    return request({
-      url: '/visit-records/export',
-      method: 'get',
-      params,
-      responseType: 'blob'
-    })
-  }
-  export function getCustomerVisits(customerId) {
-    return request({
-      url: `/visit-records/customer/${customerId}`,
-      method: 'get'
-    })  }
+  return request({
+    url: '/visit-records/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 根据客户获取拜访记录
+ */
+export function getCustomerVisits(customerId) {
+  return request({
+    url: `/visit-records/customer/${customerId}`,
+    method: 'get'
+  })
+}

@@ -37,8 +37,8 @@
               <div class="info-item">
                 <span class="label">客户级别：</span>
                 <span class="value">
-                  <el-tag :type="getCustomerLevelType(data.level)" size="small">
-                    {{ getCustomerLevelText(data.level) }}
+                  <el-tag :type="getCustomerLevelType(data.influenceLevel)" size="small">
+                    {{ getCustomerLevelText(data.influenceLevel) }}
                   </el-tag>
                 </span>
               </div>
@@ -66,7 +66,7 @@
               </div>
               <div class="info-item">
                 <span class="label">办公地址：</span>
-                <span class="value">{{ data.address || '-' }}</span>
+                <span class="value">{{ data.officeLocation || '-' }}</span>
               </div>
             </div>
           </div>
@@ -92,8 +92,8 @@
                     {{ data.email || '-' }}
                   </el-descriptions-item>
                   <el-descriptions-item label="客户级别">
-                    <el-tag :type="getCustomerLevelType(data.level)">
-                      {{ getCustomerLevelText(data.level) }}
+                    <el-tag :type="getCustomerLevelType(data.influenceLevel)">
+                      {{ getCustomerLevelText(data.influenceLevel) }}
                     </el-tag>
                   </el-descriptions-item>
                 </el-descriptions>
@@ -116,7 +116,7 @@
                     {{ data.departmentName || '-' }}
                   </el-descriptions-item>
                   <el-descriptions-item label="办公地址">
-                    {{ data.address || '-' }}
+                    {{ data.officeLocation  || '-' }}
                   </el-descriptions-item>
                 </el-descriptions>
               </div>
@@ -191,6 +191,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { getCustomerDetail } from '@/api/customers'
+import { getCustomerVisits } from '@/api/visits'
 
 const route = useRoute()
 const router = useRouter()
@@ -208,18 +210,18 @@ const checkScreenSize = () => {
 // 工具方法
 const getCustomerLevelType = (level) => {
   const typeMap = {
-    'IMPORTANT': 'danger',
-    'NORMAL': 'success',
-    'POTENTIAL': 'warning'
+    HIGH: 'danger',
+    MEDIUM: 'warning',
+    LOW: 'success'
   }
   return typeMap[level] || 'info'
 }
 
 const getCustomerLevelText = (level) => {
   const textMap = {
-    'IMPORTANT': '重要客户',
-    'NORMAL': '普通客户',
-    'POTENTIAL': '潜在客户'
+    HIGH: '高影响力',
+    MEDIUM: '中影响力',
+    LOW: '低影响力'
   }
   return textMap[level] || level
 }
@@ -306,37 +308,23 @@ const handleViewVisit = (visit) => {
 // 加载数据
 const loadData = async () => {
   loading.value = true
+  visitLoading.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    data.value = {
-      id: route.params.id,
-      name: '张教授',
-      position: '计算机学院院长',
-      phone: '13800138001',
-      email: 'zhang@pku.edu.cn',
-      level: 'IMPORTANT',
-      schoolName: '北京大学',
-      schoolType: 'PROJECT_985',
-      departmentName: '计算机学院',
-      address: '北京市海淀区颐和园路5号'
-    }
-
-    visitRecords.value = [
-      {
-        id: 1,
-        visitDate: '2024-01-15',
-        visitType: 'VISIT',
-        status: 'COMPLETED',
-        intentLevel: 'A',
-        salesName: '李销售',
-        notes: '客户很感兴趣，有合作意向'
-      }
-    ]
+    const res = await getCustomerDetail(route.params.id)
+    data.value = res.data
   } catch (error) {
-    ElMessage.error('加载数据失败')
+    ElMessage.error('加载客户信息失败')
   } finally {
     loading.value = false
+  }
+
+  try {
+    const visitRes = await getCustomerVisits(route.params.id)
+    visitRecords.value = visitRes.data || []
+  } catch (error) {
+    ElMessage.error('加载拜访记录失败')
+  } finally {
+    visitLoading.value = false
   }
 }
 
