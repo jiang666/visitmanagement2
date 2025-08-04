@@ -14,11 +14,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update  # 自动建表或更新结构，可根据需要设为 validate / none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
+        format_sql: false
 
   mvc:
     pathmatch:

@@ -111,10 +111,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/auth/verify").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/auth/user-info").authenticated()
                 
-                // 测试和调试端点 - 临时允许访问
-                .antMatchers("/api/test/**").permitAll()
-                .antMatchers("/api/debug/**").permitAll()
-                .antMatchers("/api/simple-test/**").permitAll()
+                // 健康检查端点
 
                 // 用户管理 - 需要管理员权限
                 .antMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "MANAGER")
