@@ -1,5 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import Layout from '@/layout/index.vue'
 
@@ -295,32 +296,32 @@ const router = createRouter({
 })
 
 // 路由守卫
-// router.beforeEach((to, from, next) => {
-//   const userStore = useUserStore()
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
   
-//   // 设置页面标题
-//   document.title = to.meta.title ? `${to.meta.title} - 客户拜访管理系统` : '客户拜访管理系统'
+  // 设置页面标题
+  document.title = to.meta.title ? `${to.meta.title} - 客户拜访管理系统` : '客户拜访管理系统'
   
-//   // 检查是否需要登录
-//   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-//     next('/login')
-//     return
-//   }
+  // 检查是否需要登录
+  if (to.meta.requiresAuth && !userStore.isAuthenticated) {
+    next('/login')
+    return
+  }
   
-//   // 检查角色权限
-//   if (to.meta.roles && !to.meta.roles.includes(userStore.user?.role)) {
-//     ElMessage.error('您没有权限访问该页面')
-//     next('/dashboard')
-//     return
-//   }
+  // 检查角色权限
+  if (to.meta.roles && !to.meta.roles.includes(userStore.user?.role)) {
+    ElMessage.error('您没有权限访问该页面')
+    next('/dashboard')
+    return
+  }
   
-//   // 已登录用户访问登录页，重定向到首页
-//   if (to.path === '/login' && userStore.isAuthenticated) {
-//     next('/dashboard')
-//     return
-//   }
+  // 已登录用户访问登录页，重定向到首页
+  if (to.path === '/login' && userStore.isAuthenticated) {
+    next('/dashboard')
+    return
+  }
   
-//   next()
-// })
+  next()
+})
 
 export default router
