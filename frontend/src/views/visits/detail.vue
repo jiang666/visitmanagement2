@@ -75,6 +75,14 @@
                   </el-tag>
                 </span>
               </div>
+              <div class="info-item" v-if="data.budgetRange">
+                <span class="label">预期收益：</span>
+                <span class="value">{{ data.budgetRange }}</span>
+              </div>
+              <div class="info-item" v-if="data.location">
+                <span class="label">拜访地点：</span>
+                <span class="value">{{ data.location }}</span>
+              </div>
             </div>
           </div>
 

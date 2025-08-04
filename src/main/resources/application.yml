@@ -6,7 +6,7 @@ spring:
     active: dev  # 默认启用 dev 环境
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:12100/visit_management?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    url: jdbc:mysql://127.0.0.1:12100/visit_management?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&useUnicode=true
     username: bunny
     password: bunny
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -14,11 +14,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update  # 自动建表或更新结构，可根据需要设为 validate / none
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: false
+        format_sql: true
 
   mvc:
     pathmatch:

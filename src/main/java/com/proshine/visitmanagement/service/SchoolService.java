@@ -52,13 +52,19 @@ public class SchoolService {
      */
     public PageResponse<SchoolResponse> getSchools(String keyword, String province, String city,
                                                    String schoolType, Pageable pageable, Authentication authentication) {
-        log.debug("分页查询学校: keyword={}, province={}, city={}, schoolType={}",
-                keyword, province, city, schoolType);
+        log.info("=== 分页查询学校调试信息 ===");
+        log.info("接收到的参数 - keyword: [{}], length: {}", keyword, keyword != null ? keyword.length() : 0);
+        log.info("关键词字节数组: {}", keyword != null ? java.util.Arrays.toString(keyword.getBytes(java.nio.charset.StandardCharsets.UTF_8)) : "null");
+        log.info("province: [{}], city: [{}], schoolType: [{}]", province, city, schoolType);
 
         // 转换schoolType字符串为枚举
         School.SchoolType schoolTypeEnum = parseSchoolType(schoolType);
 
         Page<School> schoolPage = schoolRepository.findSchoolsWithFilters(keyword, province, city, schoolTypeEnum, pageable);
+        
+        log.info("查询结果: 找到 {} 条记录", schoolPage.getTotalElements());
+        schoolPage.getContent().forEach(school -> 
+            log.info("学校: ID={}, Name=[{}]", school.getId(), school.getName()));
 
         List<SchoolResponse> schoolResponses = schoolPage.getContent().stream()
                 .map(this::convertToResponse)
@@ -356,7 +362,24 @@ public class SchoolService {
      * 搜索学校
      */
     public List<SchoolResponse> searchSchools(String keyword, Integer limit) {
-        List<School> schools = schoolRepository.findByNameContainingIgnoreCase(keyword);
+        log.info("=== 搜索学校调试 ===");
+        log.info("搜索关键词: [{}]", keyword);
+        
+        // 尝试多种查询方法
+        List<School> result1 = schoolRepository.findByNameContaining(keyword);
+        log.info("findByNameContaining 结果: {} 条", result1.size());
+        
+        List<School> result2 = schoolRepository.findByNameContainingIgnoreCase(keyword);
+        log.info("findByNameContainingIgnoreCase 结果: {} 条", result2.size());
+        
+        // 查询所有学校然后手动过滤
+        List<School> allSchools = schoolRepository.findAll();
+        long manualCount = allSchools.stream()
+                .filter(school -> school.getName() != null && school.getName().contains(keyword))
+                .count();
+        log.info("手动过滤结果: {} 条", manualCount);
+        
+        List<School> schools = result2; // 使用不区分大小写的查询
         return schools.stream()
                 .limit(limit != null ? limit : Integer.MAX_VALUE)
                 .map(this::convertToResponse)

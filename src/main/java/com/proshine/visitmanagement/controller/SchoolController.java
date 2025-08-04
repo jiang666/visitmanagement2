@@ -52,7 +52,7 @@ public class SchoolController {
             @RequestParam(required = false) String province,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String schoolType,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
             Authentication authentication) {
 
         log.debug("分页查询学校: keyword={}, province={}, city={}, schoolType={}, page={}, size={}",

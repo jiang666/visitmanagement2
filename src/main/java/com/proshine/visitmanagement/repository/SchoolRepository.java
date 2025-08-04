@@ -144,12 +144,11 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      */
     @Query("SELECT s FROM School s WHERE " +
             "(:keyword IS NULL OR :keyword = '' OR " +
-            " LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            " LOWER(s.address) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            " s.name LIKE CONCAT('%', :keyword, '%') OR " +
+            " s.address LIKE CONCAT('%', :keyword, '%')) AND " +
             "(:province IS NULL OR :province = '' OR s.province = :province) AND " +
             "(:city IS NULL OR :city = '' OR s.city = :city) AND " +
-            "(:schoolType IS NULL OR s.schoolType = :schoolType) " +
-            "ORDER BY s.name ASC")
+            "(:schoolType IS NULL OR s.schoolType = :schoolType)")
     Page<School> findSchoolsWithFilters(@Param("keyword") String keyword,
                                         @Param("province") String province,
                                         @Param("city") String city,
@@ -167,8 +166,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      */
     @Query("SELECT s FROM School s WHERE " +
             "(:keyword IS NULL OR :keyword = '' OR " +
-            " LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            " LOWER(s.address) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            " s.name LIKE CONCAT('%', :keyword, '%') OR " +
+            " s.address LIKE CONCAT('%', :keyword, '%')) AND " +
             "(:province IS NULL OR :province = '' OR s.province = :province) AND " +
             "(:city IS NULL OR :city = '' OR s.city = :city) AND " +
             "(:schoolType IS NULL OR s.schoolType = :schoolType) " +
@@ -186,10 +185,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @return 分页结果
      */
     @Query("SELECT s FROM School s WHERE " +
-            "LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.address) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.province) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.city) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "s.name LIKE CONCAT('%', :keyword, '%') OR " +
+            "s.address LIKE CONCAT('%', :keyword, '%') OR " +
+            "s.province LIKE CONCAT('%', :keyword, '%') OR " +
+            "s.city LIKE CONCAT('%', :keyword, '%') " +
             "ORDER BY s.name ASC")
     Page<School> searchSchools(@Param("keyword") String keyword, Pageable pageable);
 

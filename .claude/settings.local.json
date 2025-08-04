@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(mysql:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(taskkill:*)",
+      "Bash(telnet:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
