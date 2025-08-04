@@ -32,14 +32,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     /**
-     * 根据邮箱查找用户
-     *
-     * @param email 邮箱
-     * @return 用户信息
-     */
-    Optional<User> findByEmail(String email);
-
-    /**
      * 检查用户名是否存在
      *
      * @param username 用户名
@@ -54,22 +46,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return 是否存在
      */
     boolean existsByEmail(String email);
-
+    
     /**
-     * 根据角色查找用户
-     *
-     * @param role 角色
-     * @return 用户列表
+     * 根据角色查询用户 - 用于 UserService
      */
     List<User> findByRole(User.UserRole role);
-
+    
     /**
-     * 根据部门查找用户
-     *
-     * @param department 部门
-     * @return 用户列表
+     * 根据部门查询用户 - 用于 UserService
      */
     List<User> findByDepartment(String department);
+    
+    /**
+     * 根据角色和部门查询活跃用户 - 用于 UserService
+     */
+    @Query("SELECT u FROM User u WHERE u.role = :role AND u.department = :department AND u.status = 'ACTIVE'")
+    List<User> findActiveUsersByRoleAndDepartment(@Param("role") User.UserRole role, @Param("department") String department);
 
     /**
      * 根据状态查找用户
@@ -104,38 +96,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                     @Param("status") User.UserStatus status,
                                     Pageable pageable);
 
-    /**
-     * 根据角色和部门查找活跃用户
-     *
-     * @param role 角色
-     * @param department 部门
-     * @return 用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.role = :role AND u.department = :department " +
-            "AND u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE " +
-            "ORDER BY u.createdAt DESC")
-    List<User> findActiveUsersByRoleAndDepartment(@Param("role") User.UserRole role,
-                                                  @Param("department") String department);
-
-    /**
-     * 根据角色和状态查找用户
-     *
-     * @param role 角色
-     * @param status 状态
-     * @return 用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.role = :role AND u.status = :status ORDER BY u.createdAt DESC")
-    List<User> findByRoleAndStatus(@Param("role") User.UserRole role, @Param("status") User.UserStatus status);
-
-    /**
-     * 根据部门和状态查找用户
-     *
-     * @param department 部门
-     * @param status 状态
-     * @return 用户列表
-     */
-    List<User> findByDepartmentAndStatus(String department, User.UserStatus status);
-
     // ==================== 统计查询方法 ====================
 
     /**
@@ -145,30 +105,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return 用户数量
      */
     long countByCreatedAtAfter(LocalDateTime createdAt);
-
-    /**
-     * 根据角色统计用户数量
-     *
-     * @param role 角色
-     * @return 用户数量
-     */
-    long countByRole(User.UserRole role);
-
-    /**
-     * 根据状态统计用户数量
-     *
-     * @param status 状态
-     * @return 用户数量
-     */
-    long countByStatus(User.UserStatus status);
-
-    /**
-     * 根据部门统计用户数量
-     *
-     * @param department 部门
-     * @return 用户数量
-     */
-    long countByDepartment(String department);
 
     /**
      * 统计各部门用户数量
@@ -185,23 +121,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT u.role, COUNT(u) FROM User u WHERE u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE GROUP BY u.role")
     List<Object[]> countUsersByRole();
-
-    /**
-     * 统计各状态用户数量
-     *
-     * @return 状态用户统计（状态，用户数量）
-     */
-    @Query("SELECT u.status, COUNT(u) FROM User u GROUP BY u.status")
-    List<Object[]> countUsersByStatus();
-
-    /**
-     * 根据创建时间范围统计用户数量
-     *
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 用户数量
-     */
-    long countByCreatedAtBetween(LocalDateTime startTime, LocalDateTime endTime);
 
     // ==================== 验证查询方法 ====================
 
@@ -224,86 +143,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = :email AND u.id != :excludeId")
     boolean existsByEmailAndIdNot(@Param("email") String email, @Param("excludeId") Long excludeId);
-
-    // ==================== 查询列表方法 ====================
-
-    /**
-     * 查找最近创建的用户
-     *
-     * @param pageable 分页参数
-     * @return 最近创建的用户列表
-     */
-    @Query("SELECT u FROM User u ORDER BY u.createdAt DESC")
-    List<User> findRecentUsers(Pageable pageable);
-
-    /**
-     * 查找最近登录的用户
-     *
-     * @param pageable 分页参数
-     * @return 最近登录的用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.lastLoginAt IS NOT NULL ORDER BY u.lastLoginAt DESC")
-    List<User> findRecentLoginUsers(Pageable pageable);
-
-    /**
-     * 根据创建时间范围查找用户列表
-     *
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 用户列表
-     */
-    List<User> findByCreatedAtBetween(LocalDateTime startTime, LocalDateTime endTime);
-
-    /**
-     * 根据最后登录时间范围查找用户列表
-     *
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return 用户列表
-     */
-    List<User> findByLastLoginAtBetween(LocalDateTime startTime, LocalDateTime endTime);
-
-    // ==================== 特殊查询方法 ====================
-
-    /**
-     * 查找活跃用户列表
-     *
-     * @return 活跃用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE ORDER BY u.createdAt DESC")
-    List<User> findActiveUsers();
-
-    /**
-     * 查找管理员用户列表
-     *
-     * @return 管理员用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.role = com.proshine.visitmanagement.entity.User$UserRole.ADMIN AND u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE ORDER BY u.createdAt DESC")
-    List<User> findAdminUsers();
-
-    /**
-     * 查找销售人员列表
-     *
-     * @return 销售人员列表
-     */
-    @Query("SELECT u FROM User u WHERE u.role = com.proshine.visitmanagement.entity.User$UserRole.SALES AND u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE ORDER BY u.realName")
-    List<User> findSalesUsers();
-
-    /**
-     * 查找指定部门的活跃用户
-     *
-     * @param department 部门
-     * @return 活跃用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.department = :department AND u.status = com.proshine.visitmanagement.entity.User$UserStatus.ACTIVE ORDER BY u.realName")
-    List<User> findActiveUsersByDepartment(@Param("department") String department);
-
-    /**
-     * 查找长时间未登录的用户
-     *
-     * @param beforeDate 指定日期之前
-     * @return 用户列表
-     */
-    @Query("SELECT u FROM User u WHERE u.lastLoginAt IS NULL OR u.lastLoginAt < :beforeDate ORDER BY u.lastLoginAt ASC")
-    List<User> findUsersNotLoginSince(@Param("beforeDate") LocalDateTime beforeDate);
 }
