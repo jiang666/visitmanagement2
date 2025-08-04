@@ -34,6 +34,9 @@
                 v-model="searchForm.schoolType"
                 placeholder="全部类型"
                 clearable
+                multiple
+                collapse-tags
+                collapse-tags-tooltip
                 class="standard-select"
             >
               <el-option
@@ -117,11 +120,24 @@
 
         <el-table-column prop="name" label="学校名称" min-width="200" />
 
-        <el-table-column prop="schoolType" label="学校类型" width="120">
+        <el-table-column prop="schoolType" label="学校类型" width="200">
           <template #default="{ row }">
-            <el-tag :type="getSchoolTypeColor(row.schoolType)">
-              {{ getSchoolTypeText(row.schoolType) }}
-            </el-tag>
+            <div v-if="row.schoolTypes && row.schoolTypes.length > 0">
+              <el-tag 
+                v-for="type in row.schoolTypes" 
+                :key="type" 
+                :type="getSchoolTypeColor(type)"
+                style="margin-right: 4px; margin-bottom: 2px;"
+                size="small"
+              >
+                {{ getSchoolTypeText(type) }}
+              </el-tag>
+            </div>
+            <div v-else>
+              <el-tag :type="getSchoolTypeColor(row.schoolType)">
+                {{ getSchoolTypeText(row.schoolType) }}
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
 
@@ -177,10 +193,13 @@
           <el-input v-model="schoolForm.name" placeholder="请输入学校名称" />
         </el-form-item>
 
-        <el-form-item label="学校类型" prop="schoolType">
+        <el-form-item label="学校类型" prop="schoolTypes">
           <el-select
-              v-model="schoolForm.schoolType"
+              v-model="schoolForm.schoolTypes"
               placeholder="请选择学校类型"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
               style="width: 100%"
               class="standard-select"
           >
@@ -313,7 +332,7 @@ const checkScreenSize = () => {
 const searchForm = reactive({
   keyword: '',
   province: null,
-  schoolType: null
+  schoolType: []
 })
 
 const pagination = reactive({
@@ -324,7 +343,7 @@ const pagination = reactive({
 
 const schoolForm = reactive({
   name: '',
-  schoolType: 'REGULAR',
+  schoolTypes: ['REGULAR'],
   province: '',
   city: '',
   address: '',
@@ -408,7 +427,7 @@ const schoolTypeOptions = [
 
 const schoolRules = {
   name: [{ required: true, message: '请输入学校名称', trigger: 'blur' }],
-  schoolType: [{ required: true, message: '请选择学校类型', trigger: 'change' }],
+  schoolTypes: [{ required: true, message: '请选择学校类型', trigger: 'change' }],
   province: [{ required: true, message: '请选择省份', trigger: 'change' }],
   city: [{ required: true, message: '请输入城市', trigger: 'blur' }]
 }
@@ -425,7 +444,7 @@ const loadData = async () => {
       size: pagination.size,
       keyword: searchForm.keyword,
       province: searchForm.province,
-      schoolType: searchForm.schoolType
+      schoolType: Array.isArray(searchForm.schoolType) ? searchForm.schoolType.join(',') : searchForm.schoolType
     }
 
     const response = await getSchoolList(params)
@@ -454,7 +473,7 @@ const handleReset = () => {
   Object.assign(searchForm, {
     keyword: '',
     province: null,
-    schoolType: null
+    schoolType: []
   })
   pagination.page = 1
   loadData()
@@ -465,7 +484,7 @@ const handleCreateSchool = () => {
   isEditSchool.value = false
   Object.assign(schoolForm, {
     name: '',
-    schoolType: 'REGULAR',
+    schoolTypes: ['REGULAR'],
     province: '',
     city: '',
     address: '',
@@ -477,7 +496,10 @@ const handleCreateSchool = () => {
 
 const handleEditSchool = (row) => {
   isEditSchool.value = true
-  Object.assign(schoolForm, row)
+  Object.assign(schoolForm, {
+    ...row,
+    schoolTypes: row.schoolTypes || [row.schoolType] // 使用新字段或向后兼容旧字段
+  })
   schoolDialogVisible.value = true
 }
 
@@ -596,7 +618,7 @@ const handleExportSchools = async () => {
     const params = {
       keyword: searchForm.keyword,
       province: searchForm.province,
-      schoolType: searchForm.schoolType
+      schoolType: Array.isArray(searchForm.schoolType) ? searchForm.schoolType.join(',') : searchForm.schoolType
     }
 
     const response = await exportSchools(params)

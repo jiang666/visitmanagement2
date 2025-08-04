@@ -55,10 +55,10 @@ public class SchoolService {
         log.debug("分页查询学校: keyword={}, province={}, city={}, schoolType={}",
                 keyword, province, city, schoolType);
 
-        // 转换schoolType字符串为枚举
-        School.SchoolType schoolTypeEnum = parseSchoolType(schoolType);
+        // 转换schoolType字符串为正则表达式
+        String schoolTypesRegex = buildSchoolTypesRegex(schoolType);
 
-        Page<School> schoolPage = schoolRepository.findSchoolsWithFilters(keyword, province, city, schoolTypeEnum, pageable);
+        Page<School> schoolPage = schoolRepository.findSchoolsWithFilters(keyword, province, city, schoolTypesRegex, pageable);
 
         List<SchoolResponse> schoolResponses = schoolPage.getContent().stream()
                 .map(this::convertToResponse)
@@ -111,7 +111,7 @@ public class SchoolService {
         school.setAddress(request.getAddress());
         school.setProvince(request.getProvince());
         school.setCity(request.getCity());
-        school.setSchoolType(parseSchoolType(request.getSchoolType()));
+        school.setSchoolTypes(parseSchoolTypesFromRequest(request.getSchoolTypes()));
         school.setContactPhone(request.getContactPhone());
         school.setWebsite(request.getWebsite());
 
@@ -142,7 +142,7 @@ public class SchoolService {
         school.setAddress(request.getAddress());
         school.setProvince(request.getProvince());
         school.setCity(request.getCity());
-        school.setSchoolType(parseSchoolType(request.getSchoolType()));
+        school.setSchoolTypes(parseSchoolTypesFromRequest(request.getSchoolTypes()));
         school.setContactPhone(request.getContactPhone());
         school.setWebsite(request.getWebsite());
 
@@ -210,10 +210,10 @@ public class SchoolService {
         // 检查权限（仅管理员可以导出）
         checkAdminPermission(authentication);
 
-        // 转换schoolType字符串为枚举
-        School.SchoolType schoolTypeEnum = parseSchoolType(schoolType);
+        // 转换schoolType字符串为正则表达式
+        String schoolTypesRegex = buildSchoolTypesRegex(schoolType);
 
-        List<School> schools = schoolRepository.findSchoolsForExport(keyword, province, city, schoolTypeEnum);
+        List<School> schools = schoolRepository.findSchoolsForExport(keyword, province, city, schoolTypesRegex);
 
         return schools.stream()
                 .map(this::convertToResponse)
@@ -441,7 +441,87 @@ public class SchoolService {
     }
 
     /**
-     * 解析学校类型字符串为枚举
+     * 从请求中解析学校类型列表为Set
+     */
+    private Set<School.SchoolType> parseSchoolTypesFromRequest(List<String> schoolTypeStrings) {
+        if (schoolTypeStrings == null || schoolTypeStrings.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        Set<School.SchoolType> types = new HashSet<>();
+        for (String typeString : schoolTypeStrings) {
+            if (StringUtils.hasText(typeString)) {
+                try {
+                    School.SchoolType schoolType = School.SchoolType.valueOf(typeString.toUpperCase());
+                    types.add(schoolType);
+                } catch (Exception e) {
+                    log.warn("无效的学校类型: {}, 忽略", typeString);
+                }
+            }
+        }
+        return types;
+    }
+
+    /**
+     * 构建学校类型正则表达式用于查询
+     */
+    private String buildSchoolTypesRegex(String schoolTypes) {
+        if (!StringUtils.hasText(schoolTypes)) {
+            return null; // 返回null表示不过滤学校类型
+        }
+
+        String[] types = schoolTypes.split(",");
+        List<String> validTypes = new ArrayList<>();
+        
+        for (String type : types) {
+            String trimmedType = type.trim();
+            if (StringUtils.hasText(trimmedType)) {
+                try {
+                    School.SchoolType.valueOf(trimmedType.toUpperCase());
+                    validTypes.add(trimmedType.toUpperCase());
+                } catch (Exception e) {
+                    log.warn("无效的学校类型: {}, 忽略", trimmedType);
+                }
+            }
+        }
+
+        if (validTypes.isEmpty()) {
+            return null;
+        }
+
+        // 构建正则表达式：(TYPE1|TYPE2|TYPE3)
+        return "(" + String.join("|", validTypes) + ")";
+    }
+
+    /**
+     * 解析学校类型字符串为枚举列表（支持多个类型，用逗号分隔）
+     */
+    private List<School.SchoolType> parseSchoolTypes(String schoolTypes) {
+        if (!StringUtils.hasText(schoolTypes)) {
+            return null; // 返回null表示不过滤学校类型
+        }
+
+        List<School.SchoolType> typeList = new ArrayList<>();
+        String[] types = schoolTypes.split(",");
+        
+        for (String type : types) {
+            String trimmedType = type.trim();
+            if (StringUtils.hasText(trimmedType)) {
+                try {
+                    School.SchoolType schoolType = School.SchoolType.valueOf(trimmedType.toUpperCase());
+                    typeList.add(schoolType);
+                } catch (Exception e) {
+                    log.warn("无效的学校类型: {}, 忽略", trimmedType);
+                }
+            }
+        }
+
+        // 如果解析后的列表为空，返回null表示不过滤
+        return typeList.isEmpty() ? null : typeList;
+    }
+
+    /**
+     * 解析学校类型字符串为枚举（保持向后兼容）
      */
     private School.SchoolType parseSchoolType(String schoolType) {
         if (!StringUtils.hasText(schoolType)) {
@@ -486,14 +566,28 @@ public class SchoolService {
                 .max(LocalDateTime::compareTo)
                 .orElse(null);
 
+        // 获取所有学校类型
+        Set<School.SchoolType> schoolTypes = school.getSchoolTypes();
+        List<String> schoolTypeNames = schoolTypes.stream()
+                .map(School.SchoolType::name)
+                .collect(Collectors.toList());
+        List<String> schoolTypeDescriptions = schoolTypes.stream()
+                .map(School.SchoolType::getDescription)
+                .collect(Collectors.toList());
+
+        // 向后兼容：取第一个类型
+        School.SchoolType firstType = school.getSchoolType(); // 这个方法返回第一个类型或REGULAR
+
         return SchoolResponse.builder()
                 .id(school.getId())
                 .name(school.getName())
                 .address(school.getAddress())
                 .province(school.getProvince())
                 .city(school.getCity())
-                .schoolType(school.getSchoolType().name())
-                .schoolTypeDescription(school.getSchoolType().getDescription())
+                .schoolType(firstType.name()) // 向后兼容
+                .schoolTypeDescription(firstType.getDescription()) // 向后兼容
+                .schoolTypes(schoolTypeNames) // 新字段：所有类型
+                .schoolTypeDescriptions(schoolTypeDescriptions) // 新字段：所有类型描述
                 .contactPhone(school.getContactPhone())
                 .website(school.getWebsite())
                 .departmentCount(departmentCount)

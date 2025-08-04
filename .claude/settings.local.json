@@ -9,7 +9,9 @@
       "Bash(true)",
       "Bash(taskkill:*)",
       "Bash(telnet:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(mvn:*)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

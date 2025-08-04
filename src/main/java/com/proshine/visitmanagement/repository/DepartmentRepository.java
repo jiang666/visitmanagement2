@@ -352,12 +352,12 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     List<Department> findDepartmentsWithDescription();
 
     /**
-     * 根据学校类型查找院系
+     * 根据学校类型查找院系（支持多个学校类型）
      *
      * @param schoolType 学校类型
      * @return 院系列表
      */
-    @Query("SELECT d FROM Department d LEFT JOIN d.school s WHERE s.schoolType = :schoolType ORDER BY s.name, d.name")
+    @Query("SELECT d FROM Department d LEFT JOIN d.school s WHERE s.schoolTypesString LIKE CONCAT('%', :schoolType, '%') ORDER BY s.name, d.name")
     List<Department> findBySchoolType(@Param("schoolType") com.proshine.visitmanagement.entity.School.SchoolType schoolType);
 
     /**

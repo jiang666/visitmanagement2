@@ -70,7 +70,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param schoolType 学校类型
      * @return 学校列表
      */
-    List<School> findBySchoolType(School.SchoolType schoolType);
+    @Query("SELECT s FROM School s WHERE s.schoolTypesString LIKE CONCAT('%', :schoolType, '%')")
+    List<School> findBySchoolType(@Param("schoolType") School.SchoolType schoolType);
 
     /**
      * 根据学校名称模糊查询（忽略大小写）
@@ -104,7 +105,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param schoolType 学校类型
      * @return 数量
      */
-    long countBySchoolType(School.SchoolType schoolType);
+    @Query("SELECT COUNT(s) FROM School s WHERE s.schoolTypesString LIKE CONCAT('%', :schoolType, '%')")
+    long countBySchoolType(@Param("schoolType") School.SchoolType schoolType);
 
     /**
      * 根据省份统计学校数量
@@ -138,7 +140,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param keyword 关键词（学校名称或地址）
      * @param province 省份
      * @param city 城市
-     * @param schoolType 学校类型
+     * @param schoolTypes 学校类型列表
      * @param pageable 分页参数
      * @return 分页结果
      */
@@ -148,11 +150,12 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
             " s.address LIKE CONCAT('%', :keyword, '%')) AND " +
             "(:province IS NULL OR :province = '' OR s.province = :province) AND " +
             "(:city IS NULL OR :city = '' OR s.city = :city) AND " +
-            "(:schoolType IS NULL OR s.schoolType = :schoolType)")
+            "(:schoolTypesStr IS NULL OR :schoolTypesStr = '' OR " +
+            " s.schoolTypesString LIKE CONCAT('%', :schoolTypesStr, '%'))")
     Page<School> findSchoolsWithFilters(@Param("keyword") String keyword,
                                         @Param("province") String province,
                                         @Param("city") String city,
-                                        @Param("schoolType") School.SchoolType schoolType,
+                                        @Param("schoolTypesStr") String schoolTypesStr,
                                         Pageable pageable);
 
     /**
@@ -161,7 +164,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param keyword 关键词
      * @param province 省份
      * @param city 城市
-     * @param schoolType 学校类型
+     * @param schoolTypes 学校类型列表
      * @return 学校列表
      */
     @Query("SELECT s FROM School s WHERE " +
@@ -170,12 +173,13 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
             " s.address LIKE CONCAT('%', :keyword, '%')) AND " +
             "(:province IS NULL OR :province = '' OR s.province = :province) AND " +
             "(:city IS NULL OR :city = '' OR s.city = :city) AND " +
-            "(:schoolType IS NULL OR s.schoolType = :schoolType) " +
+            "(:schoolTypesStr IS NULL OR :schoolTypesStr = '' OR " +
+            " s.schoolTypesString LIKE CONCAT('%', :schoolTypesStr, '%')) " +
             "ORDER BY s.province ASC, s.city ASC, s.name ASC")
     List<School> findSchoolsForExport(@Param("keyword") String keyword,
                                       @Param("province") String province,
                                       @Param("city") String city,
-                                      @Param("schoolType") School.SchoolType schoolType);
+                                      @Param("schoolTypesStr") String schoolTypesStr);
 
     /**
      * 根据关键词搜索学校（支持多字段搜索）
@@ -227,7 +231,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param schoolType 学校类型
      * @return 省份统计结果（省份，数量）
      */
-    @Query("SELECT s.province, COUNT(s) FROM School s WHERE s.schoolType = :schoolType " +
+    @Query("SELECT s.province, COUNT(s) FROM School s WHERE s.schoolTypesString LIKE CONCAT('%', :schoolType, '%') " +
             "GROUP BY s.province ORDER BY COUNT(s) DESC")
     List<Object[]> countBySchoolTypeGroupByProvince(@Param("schoolType") School.SchoolType schoolType);
 
@@ -236,8 +240,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      *
      * @return 省份-类型统计结果（省份，学校类型，数量）
      */
-    @Query("SELECT s.province, s.schoolType, COUNT(s) FROM School s " +
-            "GROUP BY s.province, s.schoolType ORDER BY s.province, s.schoolType")
+    @Query("SELECT s.province, s.schoolTypesString, COUNT(s) FROM School s " +
+            "GROUP BY s.province, s.schoolTypesString ORDER BY s.province, s.schoolTypesString")
     List<Object[]> countByProvinceAndSchoolType();
 
     /**
@@ -269,7 +273,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      *
      * @return 学校类型统计结果（学校类型，数量）
      */
-    @Query("SELECT s.schoolType, COUNT(s) FROM School s GROUP BY s.schoolType")
+    @Query("SELECT s.schoolTypesString, COUNT(s) FROM School s GROUP BY s.schoolTypesString")
     List<Object[]> countBySchoolType();
 
     // ==================== 特殊查询方法 ====================
@@ -313,10 +317,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      *
      * @return 985/211学校列表
      */
-    @Query("SELECT s FROM School s WHERE s.schoolType IN " +
-            "(com.proshine.visitmanagement.entity.School$SchoolType.PROJECT_985, " +
-            "com.proshine.visitmanagement.entity.School$SchoolType.PROJECT_211) " +
-            "ORDER BY s.schoolType, s.name")
+    @Query("SELECT s FROM School s WHERE " +
+            "(s.schoolTypesString LIKE '%PROJECT_985%' OR " +
+            " s.schoolTypesString LIKE '%PROJECT_211%') " +
+            "ORDER BY s.name")
     List<School> findEliteSchools();
 
     /**
@@ -324,7 +328,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      *
      * @return 双一流学校列表
      */
-    @Query("SELECT s FROM School s WHERE s.schoolType = com.proshine.visitmanagement.entity.School$SchoolType.DOUBLE_FIRST_CLASS ORDER BY s.name")
+    @Query("SELECT s FROM School s WHERE s.schoolTypesString LIKE '%DOUBLE_FIRST_CLASS%' ORDER BY s.name")
     List<School> findDoubleFirstClassSchools();
 
     /**
@@ -332,7 +336,7 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      *
      * @return 普通高校列表
      */
-    @Query("SELECT s FROM School s WHERE s.schoolType = com.proshine.visitmanagement.entity.School$SchoolType.REGULAR ORDER BY s.name")
+    @Query("SELECT s FROM School s WHERE s.schoolTypesString LIKE '%REGULAR%' ORDER BY s.name")
     List<School> findRegularSchools();
 
     // ==================== 验证查询方法 ====================
@@ -363,5 +367,6 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
      * @param province 省份
      * @return 是否存在
      */
-    boolean existsBySchoolTypeAndProvince(School.SchoolType schoolType, String province);
+    @Query("SELECT COUNT(s) > 0 FROM School s WHERE s.schoolTypesString LIKE CONCAT('%', :schoolType, '%') AND s.province = :province")
+    boolean existsBySchoolTypeAndProvince(@Param("schoolType") School.SchoolType schoolType, @Param("province") String province);
 }

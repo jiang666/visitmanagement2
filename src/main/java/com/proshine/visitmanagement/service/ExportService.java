@@ -18,9 +18,10 @@ import org.springframework.util.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -474,7 +475,7 @@ public class ExportService {
                     school.setAddress(getCellValueAsString(row.getCell(cellIndex++)));
                     school.setProvince(getCellValueAsString(row.getCell(cellIndex++)));
                     school.setCity(getCellValueAsString(row.getCell(cellIndex++)));
-                    school.setSchoolType(parseSchoolType(getCellValueAsString(row.getCell(cellIndex++))));
+                    school.setSchoolTypes(parseSchoolTypes(getCellValueAsString(row.getCell(cellIndex++))));
                     school.setContactPhone(getCellValueAsString(row.getCell(cellIndex++)));
                     school.setWebsite(getCellValueAsString(row.getCell(cellIndex++)));
 
@@ -645,23 +646,55 @@ public class ExportService {
     }
 
     /**
-     * 解析学校类型（修复版本）
+     * 解析学校类型（修复版本 - 支持多个类型）
      */
-    private String parseSchoolType(String value) {
+    private List<String> parseSchoolTypes(String value) {
         if (!StringUtils.hasText(value)) {
-            return School.SchoolType.REGULAR.name();
+            return Arrays.asList(School.SchoolType.REGULAR.name());
         }
 
-        switch (value.trim()) {
-            case "985工程":
-                return School.SchoolType.PROJECT_985.name();
-            case "211工程":
-                return School.SchoolType.PROJECT_211.name();
-            case "双一流":
-                return School.SchoolType.DOUBLE_FIRST_CLASS.name();
-            default:
-                return School.SchoolType.REGULAR.name();
+        List<String> types = new ArrayList<>();
+        String[] typeArray = value.split("[,，、]"); // 支持多种分隔符
+        
+        for (String type : typeArray) {
+            String trimmedType = type.trim();
+            switch (trimmedType) {
+                case "985工程":
+                    types.add(School.SchoolType.PROJECT_985.name());
+                    break;
+                case "211工程":
+                    types.add(School.SchoolType.PROJECT_211.name());
+                    break;
+                case "双一流":
+                    types.add(School.SchoolType.DOUBLE_FIRST_CLASS.name());
+                    break;
+                case "普通高校":
+                    types.add(School.SchoolType.REGULAR.name());
+                    break;
+                default:
+                    // 尝试直接解析枚举名
+                    try {
+                        School.SchoolType.valueOf(trimmedType.toUpperCase());
+                        types.add(trimmedType.toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        // 无效类型，忽略或添加默认类型
+                        if (types.isEmpty()) {
+                            types.add(School.SchoolType.REGULAR.name());
+                        }
+                    }
+                    break;
+            }
         }
+        
+        return types.isEmpty() ? Arrays.asList(School.SchoolType.REGULAR.name()) : types;
+    }
+
+    /**
+     * 解析学校类型（保持向后兼容）
+     */
+    private String parseSchoolType(String value) {
+        List<String> types = parseSchoolTypes(value);
+        return types.get(0); // 返回第一个类型
     }
 
     /**

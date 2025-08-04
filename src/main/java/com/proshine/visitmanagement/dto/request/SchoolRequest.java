@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * 学校请求类
@@ -49,11 +50,9 @@ public class SchoolRequest {
     private String city;
 
     /**
-     * 学校类型
+     * 学校类型（支持多个类型）
      */
-    @Pattern(regexp = "^(PROJECT_985|PROJECT_211|DOUBLE_FIRST_CLASS|REGULAR)$",
-            message = "学校类型必须是: PROJECT_985, PROJECT_211, DOUBLE_FIRST_CLASS, REGULAR 之一")
-    private String schoolType;
+    private List<String> schoolTypes;
 
     /**
      * 联系电话

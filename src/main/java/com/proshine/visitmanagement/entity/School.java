@@ -13,6 +13,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * 学校实体类
@@ -71,11 +75,67 @@ public class School {
     private String city;
 
     /**
-     * 学校类型
+     * 学校类型（多个类型用逗号分隔存储）
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "school_type")
-    private SchoolType schoolType = SchoolType.REGULAR;
+    @Column(name = "school_types", length = 500)
+    private String schoolTypesString;
+
+    /**
+     * 获取学校类型集合
+     */
+    @Transient
+    public Set<SchoolType> getSchoolTypes() {
+        if (schoolTypesString == null || schoolTypesString.trim().isEmpty()) {
+            return new HashSet<>();
+        }
+        return Arrays.stream(schoolTypesString.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> {
+                    try {
+                        return SchoolType.valueOf(s);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                })
+                .filter(type -> type != null)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * 设置学校类型集合
+     */
+    @Transient
+    public void setSchoolTypes(Set<SchoolType> schoolTypes) {
+        if (schoolTypes == null || schoolTypes.isEmpty()) {
+            this.schoolTypesString = null;
+        } else {
+            this.schoolTypesString = schoolTypes.stream()
+                    .map(SchoolType::name)
+                    .collect(Collectors.joining(","));
+        }
+    }
+
+    /**
+     * 向后兼容：获取第一个学校类型
+     */
+    @Transient
+    public SchoolType getSchoolType() {
+        Set<SchoolType> types = getSchoolTypes();
+        return types.isEmpty() ? SchoolType.REGULAR : types.iterator().next();
+    }
+
+    /**
+     * 向后兼容：设置单个学校类型
+     */
+    @Transient
+    public void setSchoolType(SchoolType schoolType) {
+        Set<SchoolType> types = new HashSet<>();
+        if (schoolType != null) {
+            types.add(schoolType);
+        }
+        setSchoolTypes(types);
+    }
 
     /**
      * 联系电话
